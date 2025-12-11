@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Portfolio</title>
+    </head>
+    <body>
+        <h1>Work in progress… 👷‍♂️</h1>
+        <p>This portfolio is under construction. Come back soon to discover my projects and achievements!</p>
+        <a href="#" onclick="event.preventDefault();
+         const v=document.createElement('video'); v.src='Rickroll.mp4';
+         v.autoplay=true; v.volume=1; v.muted=false; 
+         document.body.appendChild(v); v.play();" title="Don't click please">Click here</a>
+    </body>
+</html>
