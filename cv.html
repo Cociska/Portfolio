@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV Adam Kattouf</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-sidebar: #E8E6E1; /* Beige Sable */
+            --bg-main: #FFFFFF;
+            --text-dark: #2D2D2D;
+            --text-light: #555555;
+            --accent-color: #8B5E3C; /* Marron Cuir */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        body {
+            background-color: #555;
+            display: flex;
+            justify-content: center;
+            font-family: 'Roboto', sans-serif;
+            color: var(--text-dark);
+            padding: 20px;
+        }
+
+        .page {
+            background: white;
+            width: 21cm;
+            height: 29.7cm;
+            display: flex;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* --- SIDEBAR (GAUCHE) - Version précédente "Aérée" --- */
+        .sidebar {
+            width: 32%;
+            background-color: var(--bg-sidebar);
+            padding: 30px 25px; /* Padding remis comme avant (plus large) */
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        /* Photo */
+        .photo-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+
+        .photo-container {
+            width: 170px;
+            height: 170px;
+            background-color: #D3D3D3;
+            border-radius: 50%;
+            border: 4px solid #fff;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        .photo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Contact */
+        .contact-info {
+            font-size: 0.85rem;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+        
+        .contact-item i {
+            width: 25px;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        /* Titres Sidebar */
+        .sidebar h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.05rem;
+            text-transform: uppercase;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+            font-weight: 800;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 5px;
+        }
+
+        /* Blocs Compétences */
+        .skill-block {
+            margin-bottom: 15px; /* Marge rétablie comme avant */
+        }
+
+        .skill-title {
+            display: block;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+            margin-bottom: 3px;
+        }
+
+        .skill-desc {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            line-height: 1.35;
+        }
+
+        /* QR Code */
+        .qr-section {
+            margin-top: auto;
+            text-align: center;
+            padding-bottom: 10px;
+        }
+        .qr-section img {
+            width: 85px;
+            mix-blend-mode: multiply;
+        }
+        .qr-text {
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-top: 5px;
+            text-transform: uppercase;
+        }
+
+        /* --- MAIN (DROITE) - Police plus grande & Formation remontée --- */
+        .main {
+            width: 68%;
+            padding: 40px 35px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        header {
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.6rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: var(--text-dark);
+            line-height: 1;
+            margin-bottom: 8px;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .availability {
+            font-size: 0.9rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        /* Police un peu plus grande pour le résumé */
+        .summary {
+            font-size: 0.9rem; /* Augmenté */
+            line-height: 1.5;
+            color: var(--text-light);
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        /* Titres Sections */
+        h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        h3::before {
+            content: "";
+            display: inline-block;
+            width: 9px;
+            height: 9px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+            margin-right: 12px;
+        }
+
+        /* Items */
+        .section-content {
+            margin-bottom: 7px;
+            margin-top: 5px;
+        }
+
+        .item {
+            margin-bottom: 12px;
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 2px;
+        }
+
+        .item-title {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--text-dark);
+        }
+
+        /* Date / Type de projet */
+        .item-date, .project-type {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-light);
+            font-style: italic;
+        }
+
+        .item-sub {
+            color: var(--accent-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+
+        .item-desc ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        /* Police un peu plus grande pour les listes */
+        .item-desc li {
+            position: relative;
+            padding-left: 14px;
+            font-size: 0.88rem; /* Augmenté (était 0.82) */
+            color: var(--text-light);
+            margin-bottom: 2px;
+            line-height: 1.35;
+        }
+
+        .item-desc li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--text-dark);
+            font-weight: bold;
+        }
+
+        /* Formation : Plus de "margin-top: auto" -> Elle remonte ! */
+        .education-section {
+            margin-top: 5px;
+            margin-bottom: 13px;
+        }
+
+        /* Impression */
+        @media print {
+            body { background: none; padding: 0; }
+            .page { width: 100%; height: 100%; box-shadow: none; margin: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="page">
+        <aside class="sidebar">
+            <div class="photo-wrapper">
+                <div class="photo-container">
+                    <img src="adam.jpg" alt="Adam Kattouf" style="width:100%; height:100%; object-fit:cover;" />
+                </div>
+            </div>
+
+            <div class="contact-info">
+                <div class="contact-item"><i class="fas fa-phone-alt"></i> 07 69 45 28 56</div>
+                <div class="contact-item"><i class="fas fa-envelope"></i> adam.kattouf@epitech.eu</div>
+                <div class="contact-item"><i class="fas fa-globe"></i> cociska.dev</div>
+                <div class="contact-item"><i class="fas fa-map-marker-alt"></i> Lille, France</div>
+            </div>
+
+            <h2>Compétences</h2>
+            
+            <div class="skill-block">
+                <span class="skill-title">Système & DevOps</span>
+                <span class="skill-desc">Linux (Arch, Debian), Docker, Conteneurs, n8n, Bash, SSH</span>
+            </div>
+
+            <div class="skill-block">
+                <span class="skill-title">Hardware & Réseau</span>
+                <span class="skill-desc">Montage PC, Breadboard, NAS, Réparation & Diagnostic</span>
+            </div>
+
+            <div class="skill-block">
+                <span class="skill-title">Développement</span>
+                <span class="skill-desc">C (Avancé), Python, HTML/CSS</span>
+            </div>
+
+            <h2>Langues</h2>
+            <div class="skill-block">
+                <span class="skill-title">Français</span>
+                <span class="skill-desc">Langue maternelle</span>
+            </div>
+            <div class="skill-block">
+                <span class="skill-title">Anglais (B2)</span>
+                <span class="skill-desc">Technique & Opérationnel<br>(TEPITECH : 735)</span>
+            </div>
+
+            <h2>Intérêts</h2>
+            <div class="skill-block">
+                <span class="skill-title">Piano</span>
+                <span class="skill-desc">Concerts Aéronef & Orchestre National de Lille</span>
+            </div>
+            <div class="skill-block">
+                <span class="skill-title">Exploration & Cyber</span>
+                <span class="skill-desc">Urbex, Cartographie, HackTheBox</span>
+            </div>
+
+            <div class="qr-section">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://cociska.dev&color=2D2D2D&bgcolor=E8E6E1" alt="QR Code">
+                <div class="qr-text">Portfolio</div>
+            </div>
+        </aside>
+
+        <main class="main">
+            <header>
+                <h1>ADAM KATTOUF</h1>
+                <div class="subtitle">Étudiant en informatique</div>
+                <div class="availability">Recherche de stage (4 à 6 mois) - <strong>Juin à Décembre 2026</strong></div>
+            </header>
+
+            <div class="summary">
+                Étudiant en informatique passionné par l'administration système et la cybersécurité. Fort d'une expérience très polyvalente en restauration à spectacles, j'ai développé une grande capacité d'adaptation et un sens aigu du service client. Je recherche un stage technique où je pourrai mettre ma débrouillardise (hardware/software) et ma rigueur au service de vos équipes hôtelières.
+            </div>
+
+            <section class="education-section">
+                <h3>Formation</h3>
+                <div class="item">
+                    <div class="item-header">
+                        <span class="item-title">Expert Technologies de l'Information</span>
+                        <span class="item-date">Promo 2030</span>
+                    </div>
+                    <div style="font-size:0.9rem; color:#555;">Epitech Lille - Programme Grande École</div>
+                </div>
+                <div class="item" style="margin-top:10px; margin-bottom: 0;">
+                    <div class="item-header">
+                        <span class="item-title">Baccalauréat Général</span>
+                        <span class="item-date">2025</span>
+                    </div>
+                    <div style="font-size:0.9rem; color:#555;">Lycée Fénelon Lille - <strong>Mention TRÈS BIEN</strong></div>
+                    <div style="font-size:0.85rem; color:#888;">Spécialités : Mathématiques, NSI</div>
+                </div>
+            </section>
+            <br>
+            <section class="section-content">
+                <h3>Expérience Professionnelle</h3>
+                <div class="item">
+                    <div class="item-header">
+                        <span class="item-title">Employé Polyvalent & Assistant Tech.</span>
+                        <span class="item-date">Juin 2025 – Actuel</span>
+                    </div>
+                    <div class="item-sub">Petrouchka | Lille</div>
+                    <div class="item-desc">
+                        <ul>
+                            <li><strong>Service & Relationnel :</strong> Accueil, service en salle et encaissement (fort volume).</li>
+                            <li><strong>Polyvalence :</strong> Logistique, entretien, cuisine, aide son/lumière.</li>
+                            <li><strong>Technique :</strong> Prise en main autonome des régies son/lumière en urgence.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section-content">
+                <h3>Projets</h3>
+
+                <div class="item">
+                    <div class="item-header">
+                        <span class="item-title">Infrastructure Self-Hosting</span>
+                        <span class="project-type">Projet Personnel</span>
+                    </div>
+                    <div class="item-sub">Raspberry Pi, Docker & n8n</div>
+                    <div class="item-desc">
+                        <ul>
+                            <li>Configuration serveur hébergé à domicile accessible via le web (cociska.dev).</li>
+                            <li>Déploiement services (Web, NAS) et automatisation des tâches.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="item">
+                    <div class="item-header">
+                        <span class="item-title">Flint & Admin Système</span>
+                        <span class="project-type">Projet Epitech</span>
+                    </div>
+                    <div class="item-sub">Virtualisation & Sécurité</div>
+                    <div class="item-desc">
+                        <ul>
+                            <li>Installation sécurisée Dual Boot (Fedora / Arch Linux).</li>
+                            <li>Configuration SSH, gestion permissions et scripting Bash.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="item">
+                    <div class="item-header">
+                        <span class="item-title">Développement C & Algorithmique</span>
+                        <span class="project-type">Projet Epitech</span>
+                    </div>
+                    <div class="item-desc">
+                        <ul>
+                            <li><strong>My_Hunter / My_Radar :</strong> Moteurs de jeux 2D (CSFML) avec gestion mémoire.</li>
+                            <li><strong>Secured :</strong> Table de hachage optimisée pour stockage sécurisé.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="item">
+                    <div class="item-header">
+                        <span class="item-title">Urbex Map</span>
+                        <span class="project-type">Projet Personnel</span>
+                    </div>
+                    <div class="item-desc">
+                        <ul>
+                            <li>Développement d'un outil de cartographie interactif (GitHub).</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
