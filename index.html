@@ -52,6 +52,54 @@
                 background-color: #8B5E3C;
                 transform: translateY(-2px);
             }
+            /* --- RESPONSIVE MOBILE --- */
+            @media screen and (max-width: 850px) {
+                body {
+                    padding: 0;
+                    background-color: var(--bg-sidebar); /* Fond uni sur mobile */
+                }
+
+                .page {
+                    width: 100%;
+                    height: auto; /* On laisse la hauteur s'adapter au contenu */
+                    flex-direction: column; /* On empile les éléments l'un sur l'autre */
+                    box-shadow: none; /* On retire l'ombre pour un look "app" */
+                }
+
+                /* La sidebar prend toute la largeur */
+                .sidebar {
+                    width: 100%;
+                    height: auto;
+                    padding: 30px 20px;
+                    text-align: center; /* Centre le texte (optionnel, souvent plus joli sur mobile) */
+                }
+
+                /* Ajustement de la photo pour qu'elle soit bien centrée */
+                .photo-wrapper {
+                    margin-bottom: 20px;
+                }
+
+                /* On réaligne les infos de contact au centre si on veut, ou on laisse en colonne */
+                .contact-info {
+                    align-items: center; /* Centre les items de contact */
+                }
+
+                /* Le contenu principal prend aussi toute la largeur */
+                .main {
+                    width: 100%;
+                    padding: 30px 20px;
+                }
+
+                /* Ajustement de la taille du titre pour mobile */
+                h1 {
+                    font-size: 2rem;
+                    text-align: center;
+                }
+
+                .subtitle, .availability {
+                    text-align: center;
+                }
+            }
         </style>
     </head>
     <body>
