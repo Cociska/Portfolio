@@ -8,8 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-color: #E8E6E1; /* Beige Sable du CV */
-            --accent-color: #8B5E3C; /* Marron Cuir du CV */
+            --bg-color: #E8E6E1;
+            --accent-color: #8B5E3C;
             --text-dark: #2D2D2D;
             --card-bg: #FFFFFF;
         }
@@ -69,11 +69,15 @@
             transition: 0.3s;
             display: inline-block;
             margin: 5px;
+            cursor: pointer;
+            border: none;
+            font-family: 'Roboto', sans-serif;
+            font-size: 1rem;
         }
 
         .btn-primary { background: var(--text-dark); color: white; }
         .btn-primary:hover { background: var(--accent-color); }
-        .btn-secondary { border: 2px solid var(--text-dark); color: var(--text-dark); }
+        .btn-secondary { background: transparent; border: 2px solid var(--text-dark); color: var(--text-dark); }
         .btn-secondary:hover { background: var(--text-dark); color: white; }
 
         section {
@@ -105,9 +109,7 @@
         }
 
         .card:hover { transform: translateY(-5px); }
-
         .card i { font-size: 2rem; color: var(--accent-color); margin-bottom: 15px; }
-
         .card h3 { margin-top: 0; font-family: 'Montserrat', sans-serif; }
 
         .tags { margin-top: 15px; }
@@ -130,6 +132,154 @@
         @media (max-width: 600px) {
             h1 { font-size: 2rem; }
         }
+
+        /* =========================================
+           DEBUT AJOUT MESSAGERIE - CSS
+           ========================================= */
+        .chat-popup {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 350px;
+            max-width: 90vw;
+            height: 450px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform: translateY(150%); /* Caché en bas par défaut */
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000;
+        }
+
+        .chat-popup.active {
+            transform: translateY(0); /* Animation d'ouverture */
+        }
+
+        .chat-header {
+            background: var(--text-dark);
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .chat-header h3 { margin: 0; font-size: 1.1rem; }
+        .close-chat-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .close-chat-btn:hover { color: var(--accent-color); }
+
+        .chat-body {
+            flex: 1;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            background: #f9f9f9;
+        }
+
+        /* Écran de connexion au chat */
+        .chat-login {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            text-align: center;
+        }
+        .chat-login input {
+            padding: 10px;
+            margin: 15px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 80%;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        /* Interface des messages */
+        .chat-messages-container {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+        }
+        .messages-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-bottom: 10px;
+        }
+        
+        .message {
+            max-width: 80%;
+            padding: 8px 12px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            position: relative;
+            word-wrap: break-word;
+        }
+        .message.other {
+            background: #E8E6E1;
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+        }
+        .message.mine {
+            background: var(--accent-color);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+        .msg-info {
+            font-size: 0.65rem;
+            opacity: 0.7;
+            margin-bottom: 3px;
+            display: block;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+        .chat-input-area input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            font-family: 'Roboto', sans-serif;
+            outline: none;
+        }
+        .chat-input-area input:focus { border-color: var(--accent-color); }
+        .send-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+        .send-btn:hover { background: var(--text-dark); }
+        /* =========================================
+           FIN AJOUT MESSAGERIE - CSS
+           ========================================= */
     </style>
 </head>
 <body>
@@ -143,7 +293,8 @@
         <div class="cta-container">
             <a href="cv.html" class="btn btn-primary"><i class="fas fa-file-pdf"></i> Voir mon CV</a>
             <a href="https://github.com/Cociska" class="btn btn-secondary"><i class="fab fa-github"></i> GitHub</a>
-        </div>
+            <button id="open-chat-btn" class="btn btn-secondary"><i class="fas fa-comment-dots"></i> Messagerie</button>
+            </div>
     </header>
 
     <section id="projets">
@@ -188,5 +339,136 @@
         <p>2026 Adam Kattouf - Hébergé sur mon infrastructure personnelle</p>
     </footer>
 
-</body>
+    <div class="chat-popup" id="chat-popup">
+        <div class="chat-header">
+            <h3><i class="fas fa-comment-dots"></i> Discutons !</h3>
+            <button class="close-chat-btn" id="close-chat-btn"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="chat-body">
+            
+            <div class="chat-login" id="chat-login">
+                <p>Comment dois-je vous appeler ?</p>
+                <input type="text" id="username-input" placeholder="Votre prénom ou pseudo..." autocomplete="off">
+                <button class="btn btn-primary" id="start-chat-btn">Rejoindre</button>
+            </div>
+
+            <div class="chat-messages-container" id="chat-interface">
+                <div class="messages-list" id="messages-list">
+                    </div>
+                <div class="chat-input-area">
+                    <input type="text" id="msg-input" placeholder="Écrivez un message..." autocomplete="off">
+                    <button class="send-btn" id="send-btn"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // Ta configuration Firebase
+        const firebaseConfig = {
+            apiKey: "TA_VRAIE_CLE_API", // ⚠️ N'oublie pas de remettre ta VRAIE clé ici !
+            authDomain: "portfolio-adam-1577e.firebaseapp.com",
+            projectId: "portfolio-adam-1577e",
+            storageBucket: "portfolio-adam-1577e.firebasestorage.app",
+            messagingSenderId: "282859266513",
+            appId: "1:282859266513:web:54366df533eab3ee2980f0"
+        };
+
+        // Initialisation Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Variables DOM
+        const openChatBtn = document.getElementById('open-chat-btn');
+        const closeChatBtn = document.getElementById('close-chat-btn');
+        const chatPopup = document.getElementById('chat-popup');
+        const chatLogin = document.getElementById('chat-login');
+        const chatInterface = document.getElementById('chat-interface');
+        const usernameInput = document.getElementById('username-input');
+        const startChatBtn = document.getElementById('start-chat-btn');
+        const messagesList = document.getElementById('messages-list');
+        const msgInput = document.getElementById('msg-input');
+        const sendBtn = document.getElementById('send-btn');
+
+        let currentUser = "";
+
+        // UI : Ouvrir/Fermer le chat
+        openChatBtn.addEventListener('click', () => chatPopup.classList.add('active'));
+        closeChatBtn.addEventListener('click', () => chatPopup.classList.remove('active'));
+
+        // Logique : Rejoindre le chat
+        startChatBtn.addEventListener('click', () => {
+            const username = usernameInput.value.trim();
+            if (username) {
+                currentUser = username;
+                chatLogin.style.display = 'none';
+                chatInterface.style.display = 'flex';
+                loadMessages();
+            }
+        });
+
+        // Permettre la touche "Entrée" pour le pseudo
+        usernameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') startChatBtn.click();
+        });
+
+        // Logique : Envoyer un message
+        async function sendMessage() {
+            const text = msgInput.value.trim();
+            if (text !== "" && currentUser !== "") {
+                msgInput.value = ""; // Vider l'input rapidement
+                try {
+                    await addDoc(collection(db, "messages"), {
+                        user: currentUser,
+                        text: text,
+                        timestamp: serverTimestamp()
+                    });
+                } catch (e) {
+                    console.error("Erreur d'envoi: ", e);
+                }
+            }
+        }
+
+        sendBtn.addEventListener('click', sendMessage);
+        msgInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // Logique : Charger et écouter les messages en temps réel
+        function loadMessages() {
+            const q = query(collection(db, "messages"), orderBy("timestamp", "asc"));
+            
+            onSnapshot(q, (snapshot) => {
+                messagesList.innerHTML = ''; // Nettoyer la liste
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const isMine = data.user === currentUser;
+                    
+                    // Formatage de l'heure
+                    let timeString = "";
+                    if(data.timestamp) {
+                        const date = data.timestamp.toDate();
+                        timeString = date.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
+                    }
+
+                    // Création de l'élément HTML du message
+                    const msgDiv = document.createElement('div');
+                    msgDiv.className = `message ${isMine ? 'mine' : 'other'}`;
+                    msgDiv.innerHTML = `
+                        <span class="msg-info">${data.user} • ${timeString}</span>
+                        ${data.text}
+                    `;
+                    messagesList.appendChild(msgDiv);
+                });
+                
+                // Scroll automatique vers le bas
+                messagesList.scrollTop = messagesList.scrollHeight;
+            });
+        }
+    </script>
+    </body>
 </html>
