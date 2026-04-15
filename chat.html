@@ -10,15 +10,13 @@
         :root { --bg-color: #E8E6E1; --accent-color: #8B5E3C; --text-dark: #2D2D2D; }
         body { background-color: #f9f9f9; color: var(--text-dark); font-family: 'Roboto', sans-serif; margin: 0; padding: 0; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
         
-        /* Boutons Standard */
         .btn { padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer; border: none; font-size: 1rem; font-family: 'Roboto', sans-serif; display: inline-block; width: fit-content; margin: 0 auto; }
         .btn-primary { background: var(--text-dark); color: white; transition: 0.2s; }
         .btn-primary:hover { background: var(--accent-color); }
-        .btn-danger { background: #e74c3c; color: white; }
         
-        /* Header */
+        /* Header Principal */
         .chat-header { background: var(--text-dark); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 10; }
-        .chat-header h3 { margin: 0; font-family: 'Montserrat', sans-serif; font-size: 1.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 65%; text-align: center; }
+        .chat-header h3 { margin: 0; font-family: 'Montserrat', sans-serif; font-size: 1.2rem; }
         .header-btn { color: white; text-decoration: none; font-size: 1.5rem; background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         
         .app-view { flex: 1; display: none; flex-direction: column; overflow: hidden; }
@@ -33,7 +31,7 @@
         .pin-dot.filled { background: var(--accent-color); border-color: var(--accent-color); transform: scale(1.1); }
         .hidden-pin-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: text; z-index: 10; font-size: 16px !important; }
 
-        /* Liste Users & Avatars */
+        /* Liste Users */
         .chat-selection { overflow-y: auto; background: white; }
         .user-item { padding: 15px 20px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; align-items: center; gap: 15px; transition: 0.2s; }
         .user-item:active { background: #f0ede9; }
@@ -45,19 +43,27 @@
         .user-time { font-size: 0.8rem; color: #888; }
         .user-preview { font-size: 0.9rem; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* Profil View */
+        /* Profil Modal depuis le Chat */
+        #user-info-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; }
+        .user-info-box { background: white; padding: 25px; border-radius: 20px; text-align: center; width: 80%; max-width: 300px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .user-info-box img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; border: 3px solid #eee; }
+        .user-info-box h3 { margin: 0 0 10px 0; font-family: 'Montserrat', sans-serif; font-size: 1.4rem; }
+        .user-info-box p { color: #666; margin: 0 0 20px 0; font-size: 0.95rem; }
+
+        /* Editeur Profil Perso */
         .profile-container { padding: 30px 20px; display: flex; flex-direction: column; align-items: center; overflow-y: auto; text-align: center; }
         .profile-pfp-wrapper { position: relative; margin-bottom: 20px; cursor: pointer; }
-        .profile-pfp-wrapper img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent-color); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .profile-pfp-wrapper img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent-color); }
         .profile-pfp-wrapper .edit-badge { position: absolute; bottom: 0; right: 0; background: var(--text-dark); color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; border: 2px solid white; }
         .profile-field { width: 100%; max-width: 400px; margin-bottom: 15px; text-align: left; }
         .profile-field label { font-size: 0.85rem; font-weight: bold; color: #666; margin-bottom: 5px; display: block; }
-        .profile-field input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; outline: none; box-sizing: border-box; font-size: 16px !important; }
-        .bonus-info { background: #eee; padding: 15px; border-radius: 8px; width: 100%; max-width: 400px; margin-top: 20px; font-size: 0.9rem; color: #555; }
+        .profile-field input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; outline: none; font-size: 16px !important; }
 
-        /* Chat Interface */
-        .chat-interface-header { background: #f0ede9; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
-        .header-info { display: flex; flex-direction: column; align-items: center; flex: 1; }
+        /* Chat Interface Header (Centré) */
+        .chat-interface-header { background: #f0ede9; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
+        .chat-interface-header > div { flex: 1; display: flex; justify-content: center; } /* Centre les éléments */
+        .chat-interface-header .side-action { width: 40px; display: flex; align-items: center; justify-content: center; flex: none; }
+        .header-info { display: flex; flex-direction: column; align-items: center; text-align: center; }
         .typing-box { font-size: 0.75rem; color: var(--accent-color); font-style: italic; min-height: 15px; }
 
         /* Bulles et Messages */
@@ -75,6 +81,10 @@
         .message.other { background: #f0f0f0; color: black; border-bottom-left-radius: 4px; }
         .message img { max-width: 100%; border-radius: 10px; display: block; margin-top: 5px; }
         
+        /* Audio Vocaux */
+        .message audio { height: 35px; width: 200px; outline: none; border-radius: 20px; }
+        .message.mine audio { filter: invert(1); /* Hack CSS pour fondre l'audio dans le background sombre */ }
+
         /* Réponse (Reply) UI */
         .reply-quote { background: rgba(0,0,0,0.1); padding: 6px 10px; border-radius: 6px; border-left: 3px solid rgba(0,0,0,0.3); font-size: 0.8rem; margin-bottom: 6px; display: block; opacity: 0.9; }
         .message.mine .reply-quote { background: rgba(255,255,255,0.2); border-left-color: white; }
@@ -85,14 +95,16 @@
 
         #reply-banner { display: none; background: #eee; padding: 8px 15px; border-left: 4px solid var(--accent-color); font-size: 0.85rem; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
         #reply-banner span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; margin-right: 10px; color: #555; }
-        #cancel-reply-btn { background: none; border: none; font-size: 1.2rem; color: #888; cursor: pointer; }
 
-        /* Input Area */
+        /* Input Area & Vocaux */
         .chat-input-area { display: flex; gap: 8px; padding: 10px 15px; background: white; border-top: 1px solid #eee; align-items: center; padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
         .chat-input-area input { flex: 1; padding: 12px 18px; border-radius: 25px; border: 1px solid #ddd; outline: none; font-size: 16px !important; background: #f9f9f9; }
-        .chat-input-area input:focus { border-color: var(--accent-color); background: white; }
-        .gif-btn { background: #eee; color: #555; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-weight: bold; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; }
-        .send-btn { background: var(--accent-color); color: white; border: none; border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; cursor: pointer; }
+        .gif-btn { background: #eee; color: #555; border: none; border-radius: 20px; padding: 0 12px; height: 42px; cursor: pointer; font-weight: bold; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; }
+        
+        .action-btn { background: var(--accent-color); color: white; border: none; border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; cursor: pointer; }
+        .record-btn { background: #ddd; color: var(--text-dark); transition: 0.2s; }
+        .record-btn.recording { background: #e74c3c; color: white; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
         /* GIF Panel */
         #gif-panel { display: none; height: 250px; background: white; border-top: 1px solid #ddd; flex-direction: column; padding: 10px; }
@@ -111,7 +123,7 @@
     <div class="app-view active chat-login" id="chat-step-user">
         <h2>Identifiez-vous</h2>
         <input type="text" id="username-input" placeholder="Ton pseudo..." autocomplete="off">
-        <button class="btn btn-primary" id="go-to-pin">Suivant</button>
+        <button class="btn btn-primary" id="go-to-pin" style="width: 80%; max-width: 300px;">Suivant</button>
     </div>
 
     <div class="app-view chat-login" id="chat-step-pin">
@@ -127,13 +139,13 @@
 
     <div class="app-view" id="profile-view">
         <div class="chat-interface-header">
-            <button id="close-profile-btn" style="border:none; background:none; cursor:pointer; font-size: 1.2rem;"><i class="fas fa-chevron-left"></i></button>
-            <span style="font-weight:bold; font-size: 1.1rem;">Modifier le profil</span>
-            <div style="width: 24px;"></div>
+            <div class="side-action"><button id="close-profile-btn" class="header-btn" style="color:var(--text-dark);"><i class="fas fa-chevron-left"></i></button></div>
+            <div class="header-info"><span style="font-weight:bold; font-size: 1.1rem;">Mon Profil</span></div>
+            <div class="side-action"></div>
         </div>
         <div class="profile-container">
             <div class="profile-pfp-wrapper" id="pfp-clicker">
-                <img id="profile-pfp-preview" src="Default_pfp.jpg" alt="Photo de profil" onerror="this.src='https://i.imgur.com/7I10o4M.jpeg'">
+                <img id="profile-pfp-preview" src="Default_pfp.jpg" onerror="this.src='https://i.imgur.com/7I10o4M.jpeg'">
                 <div class="edit-badge"><i class="fas fa-camera"></i></div>
                 <input type="file" id="pfp-upload" accept="image/*" style="display:none;">
             </div>
@@ -146,13 +158,7 @@
                 <label>Bio Instagram</label>
                 <input type="text" id="profile-bio-input" placeholder="Ajoutez une bio stylée...">
             </div>
-            
             <button class="btn btn-primary" id="save-profile-btn" style="margin-top: 15px; width: 100%; max-width:400px;">Sauvegarder</button>
-            
-            <div class="bonus-info">
-                <strong><i class="fas fa-info-circle"></i> Info Sécurité :</strong><br>
-                Les photos sont compressées et recadrées automatiquement depuis votre appareil avant envoi pour garantir la fluidité du chat (4K autorisé).
-            </div>
         </div>
     </div>
 
@@ -160,30 +166,40 @@
 
     <div class="app-view" id="chat-interface">
         <div class="chat-interface-header">
-            <button id="back-btn" style="border:none; background:none; cursor:pointer; font-size: 1.2rem;"><i class="fas fa-chevron-left"></i></button>
+            <div class="side-action"><button id="back-btn" class="header-btn" style="color:var(--text-dark);"><i class="fas fa-chevron-left"></i></button></div>
             <div class="header-info">
-                <span id="target-name" style="font-weight:bold;"></span>
+                <span id="target-name" style="font-weight:bold; font-size:1rem;"></span>
                 <span id="typing-box" class="typing-box"></span>
             </div>
-            <img id="target-pfp" src="Default_pfp.jpg" alt="PFP" class="avatar-img" style="width:35px; height:35px; onerror='https://i.imgur.com/7I10o4M.jpeg'">
+            <div class="side-action"><img id="target-pfp" src="Default_pfp.jpg" class="avatar-img" style="width:35px; height:35px; cursor:pointer;" onerror="this.src='https://i.imgur.com/7I10o4M.jpeg'"></div>
         </div>
         
         <div class="messages-list" id="messages-list"></div>
 
         <div id="reply-banner">
             <span id="reply-text"></span>
-            <button id="cancel-reply-btn"><i class="fas fa-times-circle"></i></button>
+            <button id="cancel-reply-btn" style="background:none; border:none; color:#888; cursor:pointer;"><i class="fas fa-times-circle"></i></button>
         </div>
 
         <div id="gif-panel">
-            <input type="text" id="gif-search" placeholder="Rechercher via Tenor..." style="padding:8px; border-radius:15px; border:1px solid #ddd; outline:none;">
+            <input type="text" id="gif-search" placeholder="Rechercher via Giphy..." style="padding:8px; border-radius:15px; border:1px solid #ddd; outline:none;">
             <div id="gif-results"></div>
         </div>
 
         <div class="chat-input-area">
-            <button class="gif-btn" id="toggle-gif"><i class="fas fa-icons"></i></button>
+            <button class="gif-btn" id="toggle-gif">GIF</button>
             <input type="text" id="msg-input" placeholder="Message..." autocomplete="off">
-            <button id="send-btn" class="send-btn"><i class="fas fa-paper-plane"></i></button>
+            <button id="send-text-btn" class="action-btn" style="display:none;"><i class="fas fa-paper-plane"></i></button>
+            <button id="record-btn" class="action-btn record-btn"><i class="fas fa-microphone"></i></button>
+        </div>
+    </div>
+
+    <div id="user-info-modal">
+        <div class="user-info-box">
+            <img id="modal-pfp" src="" onerror="this.src='https://i.imgur.com/7I10o4M.jpeg'">
+            <h3 id="modal-name"></h3>
+            <p id="modal-bio"></p>
+            <button class="btn btn-primary" onclick="document.getElementById('user-info-modal').style.display='none'">Fermer</button>
         </div>
     </div>
 
@@ -195,37 +211,26 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        let currentUser = "";
-        let currentTarget = "";
-        let messagesUnsub = null;
-        let unreadUnsub = null;
-        let usersData = {}; // Cache des profils pour les PFPs
-        const DEFAULT_PFP = "Default_pfp.jpg"; // URL de secours (assure-toi d'avoir cette image dans ton repo, ou on mettra le lien Imgur par défaut)
-        let replyingTo = null; // Stocke l'ID et texte du message répondu
+        let currentUser = ""; let currentTarget = ""; let messagesUnsub = null; let unreadUnsub = null;
+        let usersData = {}; const DEFAULT_PFP = "Default_pfp.jpg"; const EARTH_PFP = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Earth_Western_Hemisphere_transparent_background.png/150px-Earth_Western_Hemisphere_transparent_background.png";
+        let replyingTo = null;
 
-        // --- GESTION NAVIGATION ---
         function showView(viewId) {
             document.querySelectorAll('.app-view').forEach(el => el.classList.remove('active'));
             document.getElementById(viewId).classList.add('active');
-            if(viewId === 'chat-selection') {
-                document.getElementById('nav-profile-btn').style.display = 'flex';
-                document.getElementById('nav-home').style.display = 'flex';
-            } else {
-                document.getElementById('nav-profile-btn').style.display = 'none';
-                document.getElementById('nav-home').style.display = 'none';
-            }
+            const isMenu = viewId === 'chat-selection';
+            document.getElementById('nav-profile-btn').style.display = isMenu ? 'flex' : 'none';
+            document.getElementById('nav-home').style.display = isMenu ? 'flex' : 'none';
         }
 
-        // --- GESTION PIN & LOGIN ---
+        // LOGIN & PIN
         const pinInput = document.getElementById('hidden-pin-input');
         const dots = document.querySelectorAll('.pin-dot');
 
         document.getElementById('go-to-pin').onclick = () => {
             const user = document.getElementById('username-input').value.trim();
             if(user && !user.startsWith('[')) {
-                currentUser = user;
-                showView('chat-step-pin');
-                setTimeout(() => pinInput.focus(), 100);
+                currentUser = user; showView('chat-step-pin'); setTimeout(() => pinInput.focus(), 100);
             }
         };
 
@@ -239,13 +244,12 @@
                     alert("Code incorrect !"); pinInput.value = ""; dots.forEach(d => d.classList.remove('filled'));
                 } else {
                     await setDoc(userRef, { username: currentUser, pin: pinInput.value, lastSeen: serverTimestamp(), isTyping: false }, {merge:true});
-                    showView('chat-selection');
-                    initUserList();
+                    showView('chat-selection'); initUserList();
                 }
             }
         };
 
-        // --- GESTION PROFIL (PFP COMPRESSION 4K -> 150px) ---
+        // GESTION PROFIL
         document.getElementById('nav-profile-btn').onclick = async () => {
             document.getElementById('profile-name-input').value = currentUser;
             const snap = await getDoc(doc(db, "users", currentUser));
@@ -255,26 +259,22 @@
             }
             showView('profile-view');
         };
-
         document.getElementById('close-profile-btn').onclick = () => showView('chat-selection');
 
         document.getElementById('pfp-clicker').onclick = () => document.getElementById('pfp-upload').click();
-        
         let newBase64Pfp = null;
         document.getElementById('pfp-upload').onchange = (e) => {
-            const file = e.target.files[0];
-            if(!file) return;
+            const file = e.target.files[0]; if(!file) return;
             const reader = new FileReader();
             reader.onload = (event) => {
                 const img = new Image();
                 img.onload = () => {
-                    // Compresseur Canvas (Recadre au centre, max 150x150)
                     const canvas = document.createElement('canvas');
                     const size = Math.min(img.width, img.height);
                     canvas.width = 150; canvas.height = 150;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, (img.width - size)/2, (img.height - size)/2, size, size, 0, 0, 150, 150);
-                    newBase64Pfp = canvas.toDataURL('image/jpeg', 0.85); // Poids léger
+                    newBase64Pfp = canvas.toDataURL('image/jpeg', 0.85);
                     document.getElementById('profile-pfp-preview').src = newBase64Pfp;
                 };
                 img.src = event.target.result;
@@ -289,11 +289,10 @@
             showView('chat-selection');
         };
 
-        // --- LISTE USERS ---
+        // LISTE USERS
         function initUserList() {
             onSnapshot(collection(db, "users"), (usersSnap) => {
-                usersSnap.forEach(u => usersData[u.id] = u.data()); // Maj Cache Profils
-                
+                usersSnap.forEach(u => usersData[u.id] = u.data()); 
                 onSnapshot(query(collection(db, "messages"), orderBy("timestamp", "desc")), (msgSnap) => {
                     const allMsgs = msgSnap.docs.map(d => d.data());
                     const listContainer = document.getElementById('user-list-container');
@@ -317,13 +316,13 @@
         function renderUserItem(data, isGlobal = false) {
             const item = document.createElement('div');
             item.className = `user-item ${data.unread ? 'unread' : ''}`;
-            const preview = data.lastMsg ? (data.lastMsg.text.includes('http') ? "A envoyé un média" : data.lastMsg.text) : (data.bio ? data.bio : "Appuyer pour discuter");
-            const pfpSrc = isGlobal ? 'https://i.imgur.com/k2tC8B9.png' : (data.pfp || DEFAULT_PFP);
+            const preview = data.lastMsg ? (data.lastMsg.text.includes('data:audio') ? "🎙️ Message vocal" : (data.lastMsg.text.includes('http') ? "GIF" : data.lastMsg.text)) : "Appuyer pour discuter";
+            const pfpSrc = isGlobal ? EARTH_PFP : (data.pfp || DEFAULT_PFP);
             
             item.innerHTML = `
                 <img src="${pfpSrc}" class="avatar-img" onerror="this.src='https://i.imgur.com/7I10o4M.jpeg'">
                 <div class="user-info">
-                    <div class="user-top"><span class="user-name">${isGlobal ? "🌍 Salon Global" : data.username}</span></div>
+                    <div class="user-top"><span class="user-name">${isGlobal ? "Salon Global" : data.username}</span></div>
                     <div class="user-preview">${preview}</div>
                 </div>
             `;
@@ -331,39 +330,44 @@
             document.getElementById('user-list-container').appendChild(item);
         }
 
-        // --- GESTION REPLY (Swipe & Click) ---
+        // SWIPE REPLY
         function setReplyTo(user, text) {
-            replyingTo = { user, text };
+            replyingTo = { user, text: text.includes('data:audio') ? 'Message vocal' : text };
             document.getElementById('reply-banner').style.display = 'flex';
-            document.getElementById('reply-text').innerText = `Réponse à ${user} : ${text}`;
+            document.getElementById('reply-text').innerText = `Réponse à ${user} : ${replyingTo.text}`;
             document.getElementById('msg-input').focus();
         }
-        document.getElementById('cancel-reply-btn').onclick = () => {
-            replyingTo = null; document.getElementById('reply-banner').style.display = 'none';
-        };
+        document.getElementById('cancel-reply-btn').onclick = () => { replyingTo = null; document.getElementById('reply-banner').style.display = 'none'; };
 
         function addSwipeListener(msgDiv, userName, text) {
             let startX = 0, currentX = 0;
             msgDiv.addEventListener('touchstart', e => startX = e.touches[0].clientX);
             msgDiv.addEventListener('touchmove', e => {
-                currentX = e.touches[0].clientX;
-                let diff = currentX - startX;
+                currentX = e.touches[0].clientX; let diff = currentX - startX;
                 if(diff > 0 && diff < 80) msgDiv.style.transform = `translateX(${diff}px)`;
             });
-            msgDiv.addEventListener('touchend', e => {
+            msgDiv.addEventListener('touchend', () => {
                 msgDiv.style.transform = `translateX(0)`;
                 if(currentX - startX > 50) setReplyTo(userName, text);
             });
         }
 
-        // --- CHAT INTERFACE ---
+        // CHAT INTERFACE
         async function openChat(target) {
-            currentTarget = target;
-            showView('chat-interface');
-            document.getElementById('target-name').innerText = target;
-            document.getElementById('target-pfp').src = target === "Global" ? 'https://i.imgur.com/k2tC8B9.png' : (usersData[target]?.pfp || DEFAULT_PFP);
-            document.getElementById('cancel-reply-btn').click(); // Reset reply state
+            currentTarget = target; showView('chat-interface');
+            document.getElementById('target-name').innerText = target === "Global" ? "Salon Global" : target;
+            const targetPfpImg = document.getElementById('target-pfp');
+            targetPfpImg.src = target === "Global" ? EARTH_PFP : (usersData[target]?.pfp || DEFAULT_PFP);
+            document.getElementById('cancel-reply-btn').click();
             
+            targetPfpImg.onclick = () => {
+                if(target === "Global") return;
+                document.getElementById('modal-pfp').src = usersData[target]?.pfp || DEFAULT_PFP;
+                document.getElementById('modal-name').innerText = target;
+                document.getElementById('modal-bio').innerText = usersData[target]?.bio || "Aucune bio";
+                document.getElementById('user-info-modal').style.display = 'flex';
+            };
+
             const chatId = target === "Global" ? "Global" : [currentUser, target].sort().join('_');
             
             if(unreadUnsub) unreadUnsub();
@@ -374,137 +378,133 @@
             if(messagesUnsub) messagesUnsub();
             messagesUnsub = onSnapshot(query(collection(db, "messages"), orderBy("timestamp", "asc")), (snap) => {
                 const list = document.getElementById('messages-list');
-                list.innerHTML = ''; 
-                let lastUser = null;
+                list.innerHTML = ''; let lastUser = null;
 
                 snap.forEach(d => {
                     const m = d.data();
                     if(m.chatId === chatId) {
                         const isMine = m.user === currentUser;
                         const pfp = usersData[m.user]?.pfp || DEFAULT_PFP;
-                        
                         const wrapper = document.createElement('div');
                         wrapper.className = `msg-wrapper ${isMine ? 'mine' : 'other'}`;
                         
-                        // Avatar (Seulement pour les autres, caché si même utilisateur suite)
-                        if(!isMine && m.user !== lastUser) {
-                            wrapper.innerHTML = `<img src="${pfp}" class="message-avatar" onerror="this.src='https://i.imgur.com/7I10o4M.jpeg'">`;
-                        } else if (!isMine) {
-                            wrapper.innerHTML = `<div style="width:26px; height:26px; flex-shrink:0;"></div>`;
-                        }
+                        if(!isMine && m.user !== lastUser) wrapper.innerHTML = `<img src="${pfp}" class="message-avatar" onerror="this.src='https://i.imgur.com/7I10o4M.jpeg'">`;
+                        else if (!isMine) wrapper.innerHTML = `<div style="width:26px; height:26px; flex-shrink:0;"></div>`;
 
-                        const contentDiv = document.createElement('div');
-                        contentDiv.className = 'msg-content';
+                        const contentDiv = document.createElement('div'); contentDiv.className = 'msg-content';
+                        if(m.user !== lastUser && target === "Global") contentDiv.innerHTML += `<div class="sender-name">${m.user}</div>`;
+
+                        const msgDiv = document.createElement('div'); msgDiv.className = `message ${isMine ? 'mine' : 'other'}`;
+                        addSwipeListener(msgDiv, m.user, m.text);
                         
-                        // Nom si premier message
-                        if(m.user !== lastUser && target === "Global") {
-                            contentDiv.innerHTML += `<div class="sender-name">${m.user}</div>`;
-                        }
+                        const replyBtn = document.createElement('button'); replyBtn.className = 'reply-btn-hover'; replyBtn.innerHTML = '<i class="fas fa-reply"></i>';
+                        replyBtn.onclick = () => setReplyTo(m.user, m.text); msgDiv.appendChild(replyBtn);
 
-                        // Construction Bulle
-                        const msgDiv = document.createElement('div');
-                        msgDiv.className = `message ${isMine ? 'mine' : 'other'}`;
-                        addSwipeListener(msgDiv, m.user, m.text); // Ajout du Swipe mobile
-                        
-                        // Bouton Répondre PC (Hover)
-                        const replyBtn = document.createElement('button');
-                        replyBtn.className = 'reply-btn-hover';
-                        replyBtn.innerHTML = '<i class="fas fa-reply"></i>';
-                        replyBtn.onclick = () => setReplyTo(m.user, m.text);
-                        msgDiv.appendChild(replyBtn);
-
-                        // Si c'est une réponse
                         let innerHTML = '';
                         if(m.replyTo) innerHTML += `<div class="reply-quote"><b>${m.replyTo.user}</b><br>${m.replyTo.text}</div>`;
                         
-                        // Contenu (GIF ou Texte)
-                        if (m.text.includes('tenor.com') || m.text.includes('giphy.com')) {
-                            innerHTML += `<img src="${m.text}" alt="GIF">`;
-                        } else {
-                            innerHTML += m.text;
+                        if (m.text.includes('giphy.com')) innerHTML += `<img src="${m.text}" alt="GIF">`;
+                        else if (m.text.startsWith('data:audio')) {
+                            innerHTML += `<audio controls src="${m.text}"></audio>`;
+                            msgDiv.style.background = 'transparent'; msgDiv.style.padding = '0';
                         }
+                        else innerHTML += m.text;
                         
-                        msgDiv.innerHTML += innerHTML;
-                        contentDiv.appendChild(msgDiv);
-                        wrapper.appendChild(contentDiv);
-                        list.appendChild(wrapper);
-
+                        msgDiv.innerHTML += innerHTML; contentDiv.appendChild(msgDiv); wrapper.appendChild(contentDiv); list.appendChild(wrapper);
                         lastUser = m.user;
                     }
                 });
                 list.scrollTop = list.scrollHeight;
             });
 
-            if (target !== "Global") {
-                onSnapshot(doc(db, "users", target), (d) => {
-                    document.getElementById('typing-box').innerText = (d.exists() && d.data().isTyping) ? `en train d'écrire...` : "";
-                });
-            } else {
-                document.getElementById('typing-box').innerText = "Salon public";
-            }
+            if (target !== "Global") onSnapshot(doc(db, "users", target), (d) => document.getElementById('typing-box').innerText = (d.exists() && d.data().isTyping) ? `écrit...` : "");
+            else document.getElementById('typing-box').innerText = "";
         }
 
-        // --- ENVOI DE MESSAGES ---
+        // ENVOI & VOCAUX
         const msgInput = document.getElementById('msg-input');
-        msgInput.oninput = () => updateDoc(doc(db, "users", currentUser), { isTyping: msgInput.value.trim().length > 0 });
+        const sendTextBtn = document.getElementById('send-text-btn');
+        const recordBtn = document.getElementById('record-btn');
+
+        msgInput.oninput = () => {
+            const hasText = msgInput.value.trim().length > 0;
+            sendTextBtn.style.display = hasText ? 'flex' : 'none';
+            recordBtn.style.display = hasText ? 'none' : 'flex';
+            updateDoc(doc(db, "users", currentUser), { isTyping: hasText });
+        };
 
         async function sendFinal(content) {
             const chatId = currentTarget === "Global" ? "Global" : [currentUser, currentTarget].sort().join('_');
             const msgData = { user: currentUser, text: content, chatId, read: false, timestamp: serverTimestamp() };
-            if (replyingTo) msgData.replyTo = replyingTo; // Ajoute la citation
-            
+            if (replyingTo) msgData.replyTo = replyingTo;
             await addDoc(collection(db, "messages"), msgData);
-            document.getElementById('cancel-reply-btn').click(); // Ferme le bandeau
-            
-            if (currentTarget !== "Global") {
-                fetch(`https://ntfy.sh/cociska_chat_adam_${currentTarget.toLowerCase()}`, { method: 'POST', body: `${currentUser} a envoyé un message`, headers: { 'Title': 'Message Privé', 'Click': window.location.href } }).catch(e=>e);
-            }
+            document.getElementById('cancel-reply-btn').click();
+            if (currentTarget !== "Global") fetch(`https://ntfy.sh/cociska_chat_adam_${currentTarget.toLowerCase()}`, { method: 'POST', body: `${currentUser} a envoyé un message` }).catch(e=>e);
         }
 
-        document.getElementById('send-btn').onclick = () => {
-            const t = msgInput.value.trim();
-            if(t) { sendFinal(t); msgInput.value = ""; updateDoc(doc(db, "users", currentUser), { isTyping: false }); }
+        sendTextBtn.onclick = () => { const t = msgInput.value.trim(); if(t) { sendFinal(t); msgInput.value = ""; msgInput.oninput(); } };
+        msgInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendTextBtn.click(); });
+
+        // LOGIQUE MESSAGES VOCAUX
+        let mediaRecorder; let audioChunks = []; let isRecording = false;
+        
+        const startRecord = async (e) => {
+            e.preventDefault();
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream); audioChunks = [];
+                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const reader = new FileReader();
+                    reader.readAsDataURL(audioBlob);
+                    reader.onloadend = () => sendFinal(reader.result);
+                };
+                mediaRecorder.start(); isRecording = true;
+                recordBtn.classList.add('recording');
+            } catch(err) { alert("Microphone refusé."); }
         };
 
-        // Envoi avec la touche Entrée sur PC
-        msgInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') document.getElementById('send-btn').click();
-        });
+        const stopRecord = (e) => {
+            e.preventDefault();
+            if(isRecording && mediaRecorder) {
+                mediaRecorder.stop(); mediaRecorder.stream.getTracks().forEach(t => t.stop());
+                isRecording = false; recordBtn.classList.remove('recording');
+            }
+        };
 
-        // --- GIFS API TENOR ---
-        const TENOR_KEY = "LIVDSRZULECB"; // Clé de test publique robuste
+        recordBtn.addEventListener('mousedown', startRecord);
+        recordBtn.addEventListener('mouseup', stopRecord);
+        recordBtn.addEventListener('mouseleave', stopRecord);
+        recordBtn.addEventListener('touchstart', startRecord);
+        recordBtn.addEventListener('touchend', stopRecord);
+
+        // GIFS GIPHY
         document.getElementById('toggle-gif').onclick = () => {
-            const p = document.getElementById('gif-panel');
-            p.style.display = p.style.display === 'flex' ? 'none' : 'flex';
+            const p = document.getElementById('gif-panel'); p.style.display = p.style.display === 'flex' ? 'none' : 'flex';
             if (p.style.display === 'flex') searchGifs('trending');
         };
 
         async function searchGifs(term) {
-            const url = term === 'trending' ? `https://g.tenor.com/v1/trending?key=${TENOR_KEY}&limit=12` : `https://g.tenor.com/v1/search?key=${TENOR_KEY}&q=${term}&limit=12`;
-            const resp = await fetch(url);
-            const data = await resp.json();
-            const resDiv = document.getElementById('gif-results');
-            resDiv.innerHTML = '';
-            data.results.forEach(g => {
-                const img = document.createElement('img');
-                img.src = g.media[0].tinygif.url; // Format optimal
-                img.onclick = () => { sendFinal(img.src); document.getElementById('gif-panel').style.display = 'none'; };
-                resDiv.appendChild(img);
-            });
+            try {
+                const url = term === 'trending' ? `https://api.giphy.com/v1/gifs/trending?api_key=GlVGYHqc3SyCEGpoJCzO02E2pQf8J37i&limit=12` : `https://api.giphy.com/v1/gifs/search?api_key=GlVGYHqc3SyCEGpoJCzO02E2pQf8J37i&q=${term}&limit=12`;
+                const resp = await fetch(url); const data = await resp.json();
+                const resDiv = document.getElementById('gif-results'); resDiv.innerHTML = '';
+                if(data.data) { data.data.forEach(g => {
+                    const img = document.createElement('img'); img.src = g.images.fixed_height_small.url;
+                    img.onclick = () => { sendFinal(g.images.fixed_height.url); document.getElementById('gif-panel').style.display = 'none'; };
+                    resDiv.appendChild(img);
+                });}
+            } catch(e) { alert("Erreur réseau pour les GIFs"); }
         }
         document.getElementById('gif-search').oninput = (e) => searchGifs(e.target.value || 'trending');
 
-        // RETOUR HOME
+        // RETOUR
         document.getElementById('back-btn').onclick = () => {
             if(messagesUnsub) messagesUnsub(); if(unreadUnsub) unreadUnsub();
-            updateDoc(doc(db, "users", currentUser), { isTyping: false });
-            showView('chat-selection');
+            updateDoc(doc(db, "users", currentUser), { isTyping: false }); showView('chat-selection');
         };
-        
-        // Appuyer sur Entrée pour valider le pseudo
-        document.getElementById('username-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') document.getElementById('go-to-pin').click();
-        });
+        document.getElementById('username-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') document.getElementById('go-to-pin').click(); });
     </script>
 </body>
 </html>
