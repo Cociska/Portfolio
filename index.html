@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* [Ton CSS existant intact] */
         :root {
             --bg-color: #E8E6E1;
             --accent-color: #8B5E3C;
@@ -134,7 +135,7 @@
         }
 
         /* =========================================
-           DEBUT AJOUT MESSAGERIE - CSS
+           CSS MESSAGERIE V2 (Multi-salles)
            ========================================= */
         .chat-popup {
             position: fixed;
@@ -149,14 +150,12 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            transform: translateY(150%); /* Caché en bas par défaut */
+            transform: translateY(150%);
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             z-index: 1000;
         }
 
-        .chat-popup.active {
-            transform: translateY(0); /* Animation d'ouverture */
-        }
+        .chat-popup.active { transform: translateY(0); }
 
         .chat-header {
             background: var(--text-dark);
@@ -169,117 +168,52 @@
         }
 
         .chat-header h3 { margin: 0; font-size: 1.1rem; }
-        .close-chat-btn {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
+        .close-chat-btn { background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; transition: color 0.2s; }
         .close-chat-btn:hover { color: var(--accent-color); }
 
-        .chat-body {
-            flex: 1;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-            background: #f9f9f9;
-        }
+        .chat-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #f9f9f9; }
 
-        /* Écran de connexion au chat */
-        .chat-login {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            text-align: center;
-        }
-        .chat-login input {
-            padding: 10px;
-            margin: 15px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            width: 80%;
-            font-family: 'Roboto', sans-serif;
-        }
+        /* Écran 1: Login */
+        .chat-login { padding: 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; text-align: center; }
+        .chat-login input { padding: 10px; margin: 15px 0; border: 1px solid #ccc; border-radius: 5px; width: 80%; font-family: 'Roboto', sans-serif; }
 
-        /* Interface des messages */
-        .chat-messages-container {
-            display: none;
-            flex-direction: column;
-            height: 100%;
-        }
-        .messages-list {
-            flex: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            padding-bottom: 10px;
-        }
+        /* Écran 2: Sélection du destinataire */
+        .chat-selection { padding: 15px; display: none; flex-direction: column; height: 100%; }
+        .chat-selection p { font-weight: bold; margin-top: 0; font-size: 0.95rem; text-align: center; color: var(--text-dark); }
+        .user-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
         
-        .message {
-            max-width: 80%;
-            padding: 8px 12px;
-            border-radius: 15px;
-            font-size: 0.9rem;
-            position: relative;
-            word-wrap: break-word;
+        .user-list-btn {
+            background: white; border: 1px solid #ddd; padding: 12px; border-radius: 8px; text-align: left;
+            cursor: pointer; font-family: 'Roboto', sans-serif; font-size: 0.9rem; transition: 0.2s; display: flex; align-items: center; gap: 10px;
         }
-        .message.other {
-            background: #E8E6E1;
-            align-self: flex-start;
-            border-bottom-left-radius: 2px;
-        }
-        .message.mine {
-            background: var(--accent-color);
-            color: white;
-            align-self: flex-end;
-            border-bottom-right-radius: 2px;
-        }
-        .msg-info {
-            font-size: 0.65rem;
-            opacity: 0.7;
-            margin-bottom: 3px;
-            display: block;
-        }
+        .user-list-btn:hover { background: var(--accent-color); color: white; border-color: var(--accent-color); }
+        .user-list-btn i { color: #888; }
+        .user-list-btn:hover i { color: white; }
+        
+        .global-btn { border-color: var(--text-dark); font-weight: bold; }
+        .global-btn i { color: var(--text-dark); }
 
-        .chat-input-area {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-            border-top: 1px solid #eee;
-            padding-top: 10px;
+        /* Écran 3: Interface Chat */
+        .chat-messages-container { display: none; flex-direction: column; height: 100%; }
+        
+        .chat-interface-header {
+            background: #E8E6E1; padding: 8px 15px; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; font-weight: bold; border-bottom: 1px solid #ddd;
         }
-        .chat-input-area input {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 20px;
-            font-family: 'Roboto', sans-serif;
-            outline: none;
-        }
+        .back-btn { background: none; border: none; cursor: pointer; color: var(--text-dark); font-weight: bold; font-family: 'Roboto', sans-serif; transition: 0.2s; }
+        .back-btn:hover { color: var(--accent-color); }
+
+        .messages-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 15px; }
+        
+        .message { max-width: 80%; padding: 8px 12px; border-radius: 15px; font-size: 0.9rem; position: relative; word-wrap: break-word; }
+        .message.other { background: #E8E6E1; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .message.mine { background: var(--accent-color); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .msg-info { font-size: 0.65rem; opacity: 0.7; margin-bottom: 3px; display: block; }
+
+        .chat-input-area { display: flex; gap: 10px; padding: 10px 15px; background: white; border-top: 1px solid #eee; }
+        .chat-input-area input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 20px; font-family: 'Roboto', sans-serif; outline: none; }
         .chat-input-area input:focus { border-color: var(--accent-color); }
-        .send-btn {
-            background: var(--accent-color);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.2s;
-        }
+        .send-btn { background: var(--accent-color); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .send-btn:hover { background: var(--text-dark); }
-        /* =========================================
-           FIN AJOUT MESSAGERIE - CSS
-           ========================================= */
     </style>
 </head>
 <body>
@@ -287,14 +221,12 @@
     <header>
         <div class="badge">Disponible pour stage (Juillet 2026)</div>
         <h1>Adam Kattouf</h1>
-        <p class="intro">
-            Étudiant à <strong>Epitech Lille</strong>
-        </p>
+        <p class="intro">Étudiant à <strong>Epitech Lille</strong></p>
         <div class="cta-container">
             <a href="cv.html" class="btn btn-primary"><i class="fas fa-file-pdf"></i> Voir mon CV</a>
             <a href="https://github.com/Cociska" class="btn btn-secondary"><i class="fab fa-github"></i> GitHub</a>
             <button id="open-chat-btn" class="btn btn-secondary"><i class="fas fa-comment-dots"></i> Messagerie</button>
-            </div>
+        </div>
     </header>
 
     <section id="projets">
@@ -304,33 +236,16 @@
                 <i class="fas fa-server"></i>
                 <h3>Infrastructure Home-Lab</h3>
                 <p>Gestion de mon propre serveur domestique (cociska.dev). Automatisation avec n8n et déploiement de services via Docker.</p>
-                <div class="tags">
-                    <span class="tag">Docker</span>
-                    <span class="tag">Raspberry Pi</span>
-                    <span class="tag">n8n</span>
-                </div>
             </div>
-
             <div class="card">
                 <i class="fas fa-code"></i>
                 <h3>Projets Epitech (C)</h3>
                 <p>Développement de projets système : My_Radar (simulation de trafic aérien) et implémentation de tables de hachage sécurisées.</p>
-                <div class="tags">
-                    <span class="tag">Langage C</span>
-                    <span class="tag">CSFML</span>
-                    <span class="tag">Algorithmie</span>
-                </div>
             </div>
-
             <div class="card">
                 <i class="fas fa-terminal"></i>
                 <h3>Admin Système & Security</h3>
                 <p>Configuration avancée de Linux (Arch, Fedora), durcissement SSH et scripting Bash pour l'automatisation.</p>
-                <div class="tags">
-                    <span class="tag">Linux</span>
-                    <span class="tag">Bash</span>
-                    <span class="tag">SSH</span>
-                </div>
             </div>
         </div>
     </section>
@@ -349,12 +264,21 @@
             <div class="chat-login" id="chat-login">
                 <p>Comment dois-je vous appeler ?</p>
                 <input type="text" id="username-input" placeholder="Votre prénom ou pseudo..." autocomplete="off">
-                <button class="btn btn-primary" id="start-chat-btn">Rejoindre</button>
+                <button class="btn btn-primary" id="start-chat-btn">Se connecter</button>
+            </div>
+
+            <div class="chat-selection" id="chat-selection">
+                <p>Avec qui voulez-vous discuter ?</p>
+                <div class="user-list" id="user-list">
+                    </div>
             </div>
 
             <div class="chat-messages-container" id="chat-interface">
-                <div class="messages-list" id="messages-list">
-                    </div>
+                <div class="chat-interface-header">
+                    <span id="chat-target-label">Salon Global</span>
+                    <button class="back-btn" id="back-to-users-btn"><i class="fas fa-arrow-left"></i> Retour</button>
+                </div>
+                <div class="messages-list" id="messages-list"></div>
                 <div class="chat-input-area">
                     <input type="text" id="msg-input" placeholder="Écrivez un message..." autocomplete="off">
                     <button class="send-btn" id="send-btn"><i class="fas fa-paper-plane"></i></button>
@@ -366,11 +290,11 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // Ta configuration Firebase
+        // La configuration API que tu m'as fournie
         const firebaseConfig = {
-            apiKey: "TA_VRAIE_CLE_API", // ⚠️ N'oublie pas de remettre ta VRAIE clé ici !
+            apiKey: "AIzaSyAuXwoROo6ZCjZWDLq79XKzUD7oS3ws7nM",
             authDomain: "portfolio-adam-1577e.firebaseapp.com",
             projectId: "portfolio-adam-1577e",
             storageBucket: "portfolio-adam-1577e.firebasestorage.app",
@@ -378,97 +302,170 @@
             appId: "1:282859266513:web:54366df533eab3ee2980f0"
         };
 
-        // Initialisation Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
         // Variables DOM
-        const openChatBtn = document.getElementById('open-chat-btn');
-        const closeChatBtn = document.getElementById('close-chat-btn');
         const chatPopup = document.getElementById('chat-popup');
         const chatLogin = document.getElementById('chat-login');
+        const chatSelection = document.getElementById('chat-selection');
         const chatInterface = document.getElementById('chat-interface');
-        const usernameInput = document.getElementById('username-input');
-        const startChatBtn = document.getElementById('start-chat-btn');
-        const messagesList = document.getElementById('messages-list');
-        const msgInput = document.getElementById('msg-input');
-        const sendBtn = document.getElementById('send-btn');
-
+        
         let currentUser = "";
+        let currentTarget = ""; // "Global" ou le pseudo de la personne
+        let messagesUnsubscribe = null;
 
-        // UI : Ouvrir/Fermer le chat
-        openChatBtn.addEventListener('click', () => chatPopup.classList.add('active'));
-        closeChatBtn.addEventListener('click', () => chatPopup.classList.remove('active'));
+        // --- NAVIGATION UI ---
+        document.getElementById('open-chat-btn').addEventListener('click', () => chatPopup.classList.add('active'));
+        document.getElementById('close-chat-btn').addEventListener('click', () => chatPopup.classList.remove('active'));
+        
+        document.getElementById('back-to-users-btn').addEventListener('click', () => {
+            if (messagesUnsubscribe) messagesUnsubscribe(); // On arrête d'écouter les messages de cet ancien salon
+            chatInterface.style.display = 'none';
+            chatSelection.style.display = 'flex';
+        });
 
-        // Logique : Rejoindre le chat
-        startChatBtn.addEventListener('click', () => {
-            const username = usernameInput.value.trim();
-            if (username) {
+        // --- ETAPE 1 : CONNEXION ---
+        document.getElementById('start-chat-btn').addEventListener('click', async () => {
+            const username = document.getElementById('username-input').value.trim();
+            
+            // Vérifie que le pseudo n'est pas vide et ne commence pas par '['
+            if (username && !username.startsWith('[')) {
                 currentUser = username;
                 chatLogin.style.display = 'none';
-                chatInterface.style.display = 'flex';
-                loadMessages();
+                chatSelection.style.display = 'flex';
+
+                // On sauvegarde le User dans la BDD Firestore (collection "users")
+                try {
+                    await setDoc(doc(db, "users", currentUser), {
+                        username: currentUser,
+                        lastSeen: serverTimestamp()
+                    }, { merge: true });
+                } catch (e) {
+                    console.error("Erreur save user:", e);
+                }
+
+                loadUserList();
+            } else {
+                alert("Pseudo invalide (ne doit pas être vide ou commencer par '[')");
             }
         });
 
-        // Permettre la touche "Entrée" pour le pseudo
-        usernameInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') startChatBtn.click();
+        document.getElementById('username-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') document.getElementById('start-chat-btn').click();
         });
 
-        // Logique : Envoyer un message
+        // --- ETAPE 2 : LISTE DES USERS ---
+        function loadUserList() {
+            const userListDiv = document.getElementById('user-list');
+            const q = query(collection(db, "users"), orderBy("username", "asc"));
+            
+            onSnapshot(q, (snapshot) => {
+                userListDiv.innerHTML = ''; 
+
+                // 1. Bouton "Global" toujours en premier
+                const globalBtn = document.createElement('button');
+                globalBtn.className = 'user-list-btn global-btn';
+                globalBtn.innerHTML = '<i class="fas fa-globe"></i> Salon Global';
+                globalBtn.onclick = () => openChat("Global");
+                userListDiv.appendChild(globalBtn);
+
+                // 2. Ajouter les autres utilisateurs
+                snapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    const uname = data.username;
+                    
+                    // Exclure soi-même et ceux commençant par '['
+                    if (uname !== currentUser && !uname.startsWith('[')) {
+                        const btn = document.createElement('button');
+                        btn.className = 'user-list-btn';
+                        btn.innerHTML = `<i class="fas fa-user"></i> ${uname}`;
+                        btn.onclick = () => openChat(uname);
+                        userListDiv.appendChild(btn);
+                    }
+                });
+            });
+        }
+
+        // --- ETAPE 3 : OUVRIR UN CHAT ---
+        function openChat(targetUser) {
+            currentTarget = targetUser;
+            chatSelection.style.display = 'none';
+            chatInterface.style.display = 'flex';
+            
+            // Met à jour le titre en haut du chat
+            document.getElementById('chat-target-label').innerText = targetUser === "Global" ? "Salon Global" : `Message à : ${targetUser}`;
+            
+            loadMessages();
+        }
+
+        // --- ENVOI DE MESSAGES ---
         async function sendMessage() {
+            const msgInput = document.getElementById('msg-input');
             const text = msgInput.value.trim();
+            
             if (text !== "" && currentUser !== "") {
-                msgInput.value = ""; // Vider l'input rapidement
+                msgInput.value = "";
+                
+                // L'astuce du ChatId :
+                // Si Global = "Global".
+                // Si Privé = On fusionne les deux pseudos par ordre alphabétique (Ex: "Adam_Bob")
+                const expectedChatId = currentTarget === "Global" 
+                    ? "Global" 
+                    : [currentUser, currentTarget].sort().join('_');
+
                 try {
                     await addDoc(collection(db, "messages"), {
                         user: currentUser,
                         text: text,
+                        chatId: expectedChatId, // On attache la conversation au message
                         timestamp: serverTimestamp()
                     });
-                } catch (e) {
-                    console.error("Erreur d'envoi: ", e);
-                }
+                } catch (e) { console.error("Erreur d'envoi: ", e); }
             }
         }
 
-        sendBtn.addEventListener('click', sendMessage);
-        msgInput.addEventListener('keypress', (e) => {
+        document.getElementById('send-btn').addEventListener('click', sendMessage);
+        document.getElementById('msg-input').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') sendMessage();
         });
 
-        // Logique : Charger et écouter les messages en temps réel
+        // --- RECEPTION DES MESSAGES ---
         function loadMessages() {
+            const messagesList = document.getElementById('messages-list');
             const q = query(collection(db, "messages"), orderBy("timestamp", "asc"));
             
-            onSnapshot(q, (snapshot) => {
-                messagesList.innerHTML = ''; // Nettoyer la liste
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
+            // On calcule l'ID de la conversation qu'on est en train de regarder
+            const expectedChatId = currentTarget === "Global" 
+                ? "Global" 
+                : [currentUser, currentTarget].sort().join('_');
+
+            messagesUnsubscribe = onSnapshot(q, (snapshot) => {
+                messagesList.innerHTML = '';
+                snapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
                     const isMine = data.user === currentUser;
                     
-                    // Formatage de l'heure
-                    let timeString = "";
-                    if(data.timestamp) {
-                        const date = data.timestamp.toDate();
-                        timeString = date.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
-                    }
+                    // Rétrocompatibilité : si un message n'a pas de chatId (anciens messages), il est Global
+                    const msgChatId = data.chatId || "Global";
+                    
+                    // On affiche le message UNIQUEMENT s'il appartient à cette conversation
+                    if (msgChatId === expectedChatId) {
+                        let timeString = "";
+                        if(data.timestamp) {
+                            const date = data.timestamp.toDate();
+                            timeString = date.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
+                        }
 
-                    // Création de l'élément HTML du message
-                    const msgDiv = document.createElement('div');
-                    msgDiv.className = `message ${isMine ? 'mine' : 'other'}`;
-                    msgDiv.innerHTML = `
-                        <span class="msg-info">${data.user} • ${timeString}</span>
-                        ${data.text}
-                    `;
-                    messagesList.appendChild(msgDiv);
+                        const msgDiv = document.createElement('div');
+                        msgDiv.className = `message ${isMine ? 'mine' : 'other'}`;
+                        msgDiv.innerHTML = `<span class="msg-info">${data.user} • ${timeString}</span>${data.text}`;
+                        messagesList.appendChild(msgDiv);
+                    }
                 });
-                
-                // Scroll automatique vers le bas
                 messagesList.scrollTop = messagesList.scrollHeight;
             });
         }
     </script>
-    </body>
+</body>
 </html>
