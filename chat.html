@@ -37,20 +37,21 @@
         .user-item:active { background: #f0ede9; }
         .user-item.unread { background: #fdfbf8; border-left: 4px solid var(--accent-color); }
         .avatar-img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; background: #ddd; border: 1px solid #eee; flex-shrink: 0; }
+        .avatar-emoji { width: 50px; height: 50px; border-radius: 50%; background: #eee; display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; border: 1px solid #ddd; }
         .user-info { flex: 1; overflow: hidden; }
         .user-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; }
         .user-name { font-size: 1.05rem; font-weight: bold; }
         .user-time { font-size: 0.8rem; color: #888; }
         .user-preview { font-size: 0.9rem; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* Profil Modal depuis le Chat */
+        /* Modal Profil dans le Chat */
         #user-info-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; }
         .user-info-box { background: white; padding: 25px; border-radius: 20px; text-align: center; width: 80%; max-width: 300px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
         .user-info-box img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; border: 3px solid #eee; }
         .user-info-box h3 { margin: 0 0 10px 0; font-family: 'Montserrat', sans-serif; font-size: 1.4rem; }
         .user-info-box p { color: #666; margin: 0 0 20px 0; font-size: 0.95rem; }
 
-        /* Editeur Profil Perso */
+        /* Editeur Mon Profil */
         .profile-container { padding: 30px 20px; display: flex; flex-direction: column; align-items: center; overflow-y: auto; text-align: center; }
         .profile-pfp-wrapper { position: relative; margin-bottom: 20px; cursor: pointer; }
         .profile-pfp-wrapper img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent-color); }
@@ -59,38 +60,49 @@
         .profile-field label { font-size: 0.85rem; font-weight: bold; color: #666; margin-bottom: 5px; display: block; }
         .profile-field input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; outline: none; font-size: 16px !important; }
 
-        /* Chat Interface Header (Centré) */
+        /* Chat Interface Header (Parfaitement centré) */
         .chat-interface-header { background: #f0ede9; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
-        .chat-interface-header > div { flex: 1; display: flex; justify-content: center; } /* Centre les éléments */
-        .chat-interface-header .side-action { width: 40px; display: flex; align-items: center; justify-content: center; flex: none; }
-        .header-info { display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .side-action { width: 45px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .header-info { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; overflow: hidden; }
+        .header-name { font-weight: bold; font-size: 1.05rem; color: var(--text-dark); white-space: nowrap; }
         .typing-box { font-size: 0.75rem; color: var(--accent-color); font-style: italic; min-height: 15px; }
 
-        /* Bulles et Messages */
+        /* Bulles et Messages Groupés */
         .messages-list { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; background: white; overflow-x: hidden; }
-        .msg-wrapper { display: flex; align-items: flex-end; gap: 8px; margin-top: 10px; width: 100%; }
-        .msg-wrapper.mine { flex-direction: row-reverse; }
-        .msg-content { display: flex; flex-direction: column; max-width: 75%; }
-        .msg-wrapper.mine .msg-content { align-items: flex-end; }
-        .msg-wrapper.other .msg-content { align-items: flex-start; }
+        
+        .msg-group { display: flex; width: 100%; margin-top: 10px; align-items: flex-end; gap: 8px; }
+        .msg-group.mine { flex-direction: row-reverse; }
+        
+        .msg-content { display: flex; flex-direction: column; max-width: 75%; gap: 2px; }
+        .msg-group.mine .msg-content { align-items: flex-end; }
+        .msg-group.other .msg-content { align-items: flex-start; }
+        
         .sender-name { font-size: 0.75rem; color: #888; margin-bottom: 2px; margin-left: 2px; margin-right: 2px; }
-        .message-avatar { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; }
+        .message-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+        .message-avatar.emoji { display: flex; align-items: center; justify-content: center; background: #eee; font-size: 16px; border: 1px solid #ddd; }
         
         .message { padding: 10px 14px; border-radius: 18px; font-size: 0.95rem; word-wrap: break-word; line-height: 1.4; position: relative; transition: transform 0.2s; }
-        .message.mine { background: var(--accent-color); color: white; border-bottom-right-radius: 4px; }
-        .message.other { background: #f0f0f0; color: black; border-bottom-left-radius: 4px; }
+        .message.mine { background: var(--accent-color); color: white; border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
+        .message.other { background: #f0f0f0; color: black; border-top-left-radius: 4px; border-bottom-left-radius: 4px; }
+        
+        /* Arrondis pour le premier et dernier message du groupe */
+        .message:first-child { border-top-left-radius: 18px; border-top-right-radius: 18px; }
+        .message:last-child { border-bottom-left-radius: 18px; border-bottom-right-radius: 18px; }
+        .message.mine:last-child { border-bottom-right-radius: 4px; }
+        .message.other:last-child { border-bottom-left-radius: 4px; }
+
         .message img { max-width: 100%; border-radius: 10px; display: block; margin-top: 5px; }
         
         /* Audio Vocaux */
-        .message audio { height: 35px; width: 200px; outline: none; border-radius: 20px; }
-        .message.mine audio { filter: invert(1); /* Hack CSS pour fondre l'audio dans le background sombre */ }
+        .message audio { height: 35px; width: 220px; outline: none; border-radius: 20px; max-width: 100%; }
+        .message.mine audio { filter: invert(1); } /* Pour fondre dans le marron */
 
         /* Réponse (Reply) UI */
         .reply-quote { background: rgba(0,0,0,0.1); padding: 6px 10px; border-radius: 6px; border-left: 3px solid rgba(0,0,0,0.3); font-size: 0.8rem; margin-bottom: 6px; display: block; opacity: 0.9; }
         .message.mine .reply-quote { background: rgba(255,255,255,0.2); border-left-color: white; }
         .reply-btn-hover { position: absolute; top: 50%; transform: translateY(-50%); background: #ddd; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: none; align-items: center; justify-content: center; font-size: 0.8rem; color: #555; }
-        .msg-wrapper.mine .reply-btn-hover { left: -35px; }
-        .msg-wrapper.other .reply-btn-hover { right: -35px; }
+        .msg-group.mine .reply-btn-hover { left: -35px; }
+        .msg-group.other .reply-btn-hover { right: -35px; }
         .message:hover .reply-btn-hover { display: flex; }
 
         #reply-banner { display: none; background: #eee; padding: 8px 15px; border-left: 4px solid var(--accent-color); font-size: 0.85rem; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
@@ -99,10 +111,12 @@
         /* Input Area & Vocaux */
         .chat-input-area { display: flex; gap: 8px; padding: 10px 15px; background: white; border-top: 1px solid #eee; align-items: center; padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
         .chat-input-area input { flex: 1; padding: 12px 18px; border-radius: 25px; border: 1px solid #ddd; outline: none; font-size: 16px !important; background: #f9f9f9; }
-        .gif-btn { background: #eee; color: #555; border: none; border-radius: 20px; padding: 0 12px; height: 42px; cursor: pointer; font-weight: bold; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; }
+        
+        .gif-btn { background: #eee; color: #555; border: none; border-radius: 20px; padding: 0 15px; height: 42px; cursor: pointer; font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .gif-btn:hover { background: #ddd; }
         
         .action-btn { background: var(--accent-color); color: white; border: none; border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; cursor: pointer; }
-        .record-btn { background: #ddd; color: var(--text-dark); transition: 0.2s; }
+        .record-btn { background: #eee; color: var(--text-dark); transition: 0.2s; }
         .record-btn.recording { background: #e74c3c; color: white; animation: pulse 1s infinite; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
@@ -140,7 +154,7 @@
     <div class="app-view" id="profile-view">
         <div class="chat-interface-header">
             <div class="side-action"><button id="close-profile-btn" class="header-btn" style="color:var(--text-dark);"><i class="fas fa-chevron-left"></i></button></div>
-            <div class="header-info"><span style="font-weight:bold; font-size: 1.1rem;">Mon Profil</span></div>
+            <div class="header-info"><span class="header-name">Mon Profil</span></div>
             <div class="side-action"></div>
         </div>
         <div class="profile-container">
@@ -168,21 +182,22 @@
         <div class="chat-interface-header">
             <div class="side-action"><button id="back-btn" class="header-btn" style="color:var(--text-dark);"><i class="fas fa-chevron-left"></i></button></div>
             <div class="header-info">
-                <span id="target-name" style="font-weight:bold; font-size:1rem;"></span>
+                <span id="target-name" class="header-name"></span>
                 <span id="typing-box" class="typing-box"></span>
             </div>
-            <div class="side-action"><img id="target-pfp" src="Default_pfp.jpg" class="avatar-img" style="width:35px; height:35px; cursor:pointer;" onerror="this.src='https://i.imgur.com/7I10o4M.jpeg'"></div>
+            <div class="side-action" id="header-pfp-container">
+                </div>
         </div>
         
         <div class="messages-list" id="messages-list"></div>
 
         <div id="reply-banner">
             <span id="reply-text"></span>
-            <button id="cancel-reply-btn" style="background:none; border:none; color:#888; cursor:pointer;"><i class="fas fa-times-circle"></i></button>
+            <button id="cancel-reply-btn" style="background:none; border:none; color:#888; cursor:pointer; font-size:1.2rem;"><i class="fas fa-times-circle"></i></button>
         </div>
 
         <div id="gif-panel">
-            <input type="text" id="gif-search" placeholder="Rechercher via Giphy..." style="padding:8px; border-radius:15px; border:1px solid #ddd; outline:none;">
+            <input type="text" id="gif-search" placeholder="Rechercher via Tenor..." style="padding:8px; border-radius:15px; border:1px solid #ddd; outline:none;">
             <div id="gif-results"></div>
         </div>
 
@@ -212,7 +227,7 @@
         const db = getFirestore(app);
 
         let currentUser = ""; let currentTarget = ""; let messagesUnsub = null; let unreadUnsub = null;
-        let usersData = {}; const DEFAULT_PFP = "Default_pfp.jpg"; const EARTH_PFP = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Earth_Western_Hemisphere_transparent_background.png/150px-Earth_Western_Hemisphere_transparent_background.png";
+        let usersData = {}; const DEFAULT_PFP = "Default_pfp.jpg"; 
         let replyingTo = null;
 
         function showView(viewId) {
@@ -248,8 +263,9 @@
                 }
             }
         };
+        document.getElementById('username-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') document.getElementById('go-to-pin').click(); });
 
-        // GESTION PROFIL
+        // GESTION PROFIL PERSO
         document.getElementById('nav-profile-btn').onclick = async () => {
             document.getElementById('profile-name-input').value = currentUser;
             const snap = await getDoc(doc(db, "users", currentUser));
@@ -316,11 +332,21 @@
         function renderUserItem(data, isGlobal = false) {
             const item = document.createElement('div');
             item.className = `user-item ${data.unread ? 'unread' : ''}`;
-            const preview = data.lastMsg ? (data.lastMsg.text.includes('data:audio') ? "🎙️ Message vocal" : (data.lastMsg.text.includes('http') ? "GIF" : data.lastMsg.text)) : "Appuyer pour discuter";
-            const pfpSrc = isGlobal ? EARTH_PFP : (data.pfp || DEFAULT_PFP);
+            
+            // L'aperçu ne montre plus la bio, juste "Appuyer pour discuter" s'il n'y a pas de message
+            let preview = "Appuyer pour discuter";
+            if (data.lastMsg) {
+                if (data.lastMsg.text.startsWith('[AUDIO]')) preview = "🎙️ Message vocal";
+                else if (data.lastMsg.text.includes('http')) preview = "GIF";
+                else preview = data.lastMsg.text;
+            }
+
+            const pfpHTML = isGlobal 
+                ? `<div class="avatar-emoji">🌍</div>` 
+                : `<img src="${data.pfp || DEFAULT_PFP}" class="avatar-img" onerror="this.src='https://i.imgur.com/7I10o4M.jpeg'">`;
             
             item.innerHTML = `
-                <img src="${pfpSrc}" class="avatar-img" onerror="this.src='https://i.imgur.com/7I10o4M.jpeg'">
+                ${pfpHTML}
                 <div class="user-info">
                     <div class="user-top"><span class="user-name">${isGlobal ? "Salon Global" : data.username}</span></div>
                     <div class="user-preview">${preview}</div>
@@ -332,7 +358,7 @@
 
         // SWIPE REPLY
         function setReplyTo(user, text) {
-            replyingTo = { user, text: text.includes('data:audio') ? 'Message vocal' : text };
+            replyingTo = { user, text: text.startsWith('[AUDIO]') ? 'Message vocal' : text };
             document.getElementById('reply-banner').style.display = 'flex';
             document.getElementById('reply-text').innerText = `Réponse à ${user} : ${replyingTo.text}`;
             document.getElementById('msg-input').focus();
@@ -352,21 +378,28 @@
             });
         }
 
-        // CHAT INTERFACE
+        // CHAT INTERFACE & COMPACTAGE DES MESSAGES
         async function openChat(target) {
             currentTarget = target; showView('chat-interface');
             document.getElementById('target-name').innerText = target === "Global" ? "Salon Global" : target;
-            const targetPfpImg = document.getElementById('target-pfp');
-            targetPfpImg.src = target === "Global" ? EARTH_PFP : (usersData[target]?.pfp || DEFAULT_PFP);
             document.getElementById('cancel-reply-btn').click();
             
-            targetPfpImg.onclick = () => {
-                if(target === "Global") return;
-                document.getElementById('modal-pfp').src = usersData[target]?.pfp || DEFAULT_PFP;
-                document.getElementById('modal-name').innerText = target;
-                document.getElementById('modal-bio').innerText = usersData[target]?.bio || "Aucune bio";
-                document.getElementById('user-info-modal').style.display = 'flex';
-            };
+            // Gestion de la photo de profil dans le Header
+            const headerPfpContainer = document.getElementById('header-pfp-container');
+            if (target === "Global") {
+                headerPfpContainer.innerHTML = `<div class="message-avatar emoji" style="width:35px; height:35px; font-size:18px;">🌍</div>`;
+            } else {
+                const pfpUrl = usersData[target]?.pfp || DEFAULT_PFP;
+                headerPfpContainer.innerHTML = `<img src="${pfpUrl}" class="avatar-img" style="width:35px; height:35px; cursor:pointer;" onerror="this.src='https://i.imgur.com/7I10o4M.jpeg'">`;
+                
+                // Action pour ouvrir la Modal Profil (Uniquement en MP)
+                headerPfpContainer.querySelector('img').onclick = () => {
+                    document.getElementById('modal-pfp').src = pfpUrl;
+                    document.getElementById('modal-name').innerText = target;
+                    document.getElementById('modal-bio').innerText = usersData[target]?.bio || "Aucune bio";
+                    document.getElementById('user-info-modal').style.display = 'flex';
+                };
+            }
 
             const chatId = target === "Global" ? "Global" : [currentUser, target].sort().join('_');
             
@@ -378,23 +411,46 @@
             if(messagesUnsub) messagesUnsub();
             messagesUnsub = onSnapshot(query(collection(db, "messages"), orderBy("timestamp", "asc")), (snap) => {
                 const list = document.getElementById('messages-list');
-                list.innerHTML = ''; let lastUser = null;
+                list.innerHTML = ''; 
+                
+                let lastUser = null;
+                let currentGroupWrapper = null;
+                let currentContentDiv = null;
 
                 snap.forEach(d => {
                     const m = d.data();
                     if(m.chatId === chatId) {
                         const isMine = m.user === currentUser;
-                        const pfp = usersData[m.user]?.pfp || DEFAULT_PFP;
-                        const wrapper = document.createElement('div');
-                        wrapper.className = `msg-wrapper ${isMine ? 'mine' : 'other'}`;
-                        
-                        if(!isMine && m.user !== lastUser) wrapper.innerHTML = `<img src="${pfp}" class="message-avatar" onerror="this.src='https://i.imgur.com/7I10o4M.jpeg'">`;
-                        else if (!isMine) wrapper.innerHTML = `<div style="width:26px; height:26px; flex-shrink:0;"></div>`;
 
-                        const contentDiv = document.createElement('div'); contentDiv.className = 'msg-content';
-                        if(m.user !== lastUser && target === "Global") contentDiv.innerHTML += `<div class="sender-name">${m.user}</div>`;
+                        // Si c'est un nouveau groupe (nouvel utilisateur qui parle)
+                        if (m.user !== lastUser) {
+                            currentGroupWrapper = document.createElement('div');
+                            currentGroupWrapper.className = `msg-group ${isMine ? 'mine' : 'other'}`;
+                            
+                            // Affichage Avatar
+                            if (!isMine) {
+                                if (target === "Global") {
+                                    currentGroupWrapper.innerHTML = `<div class="message-avatar emoji">🌍</div>`;
+                                } else {
+                                    const pfp = usersData[m.user]?.pfp || DEFAULT_PFP;
+                                    currentGroupWrapper.innerHTML = `<img src="${pfp}" class="message-avatar" onerror="this.src='https://i.imgur.com/7I10o4M.jpeg'">`;
+                                }
+                            } else {
+                                currentGroupWrapper.innerHTML = `<div style="width:28px; height:28px; flex-shrink:0;"></div>`;
+                            }
 
-                        const msgDiv = document.createElement('div'); msgDiv.className = `message ${isMine ? 'mine' : 'other'}`;
+                            currentContentDiv = document.createElement('div'); 
+                            currentContentDiv.className = 'msg-content';
+                            
+                            if(!isMine && target === "Global") currentContentDiv.innerHTML += `<div class="sender-name">${m.user}</div>`;
+                            
+                            currentGroupWrapper.appendChild(currentContentDiv);
+                            list.appendChild(currentGroupWrapper);
+                        }
+
+                        // Création de la bulle individuelle
+                        const msgDiv = document.createElement('div'); 
+                        msgDiv.className = `message ${isMine ? 'mine' : 'other'}`;
                         addSwipeListener(msgDiv, m.user, m.text);
                         
                         const replyBtn = document.createElement('button'); replyBtn.className = 'reply-btn-hover'; replyBtn.innerHTML = '<i class="fas fa-reply"></i>';
@@ -403,14 +459,19 @@
                         let innerHTML = '';
                         if(m.replyTo) innerHTML += `<div class="reply-quote"><b>${m.replyTo.user}</b><br>${m.replyTo.text}</div>`;
                         
-                        if (m.text.includes('giphy.com')) innerHTML += `<img src="${m.text}" alt="GIF">`;
-                        else if (m.text.startsWith('data:audio')) {
-                            innerHTML += `<audio controls src="${m.text}"></audio>`;
+                        // Traitement du contenu (GIF, Audio ou Texte)
+                        if (m.text.includes('tenor.com') || m.text.includes('giphy.com')) {
+                            innerHTML += `<img src="${m.text}" alt="GIF">`;
+                        } else if (m.text.startsWith('[AUDIO]')) {
+                            const audioSrc = m.text.replace('[AUDIO]', '');
+                            innerHTML += `<audio controls src="${audioSrc}"></audio>`;
                             msgDiv.style.background = 'transparent'; msgDiv.style.padding = '0';
+                        } else {
+                            innerHTML += m.text;
                         }
-                        else innerHTML += m.text;
                         
-                        msgDiv.innerHTML += innerHTML; contentDiv.appendChild(msgDiv); wrapper.appendChild(contentDiv); list.appendChild(wrapper);
+                        msgDiv.innerHTML += innerHTML; 
+                        currentContentDiv.appendChild(msgDiv); 
                         lastUser = m.user;
                     }
                 });
@@ -421,7 +482,7 @@
             else document.getElementById('typing-box').innerText = "";
         }
 
-        // ENVOI & VOCAUX
+        // ENVOI & VOCAUX (Style Insta)
         const msgInput = document.getElementById('msg-input');
         const sendTextBtn = document.getElementById('send-text-btn');
         const recordBtn = document.getElementById('record-btn');
@@ -452,17 +513,22 @@
             e.preventDefault();
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream); audioChunks = [];
+                // Utilise le format natif sans forcer le webm pour que ça marche sur Safari iOS
+                mediaRecorder = new MediaRecorder(stream); 
+                audioChunks = [];
                 mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
                 mediaRecorder.onstop = () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const audioBlob = new Blob(audioChunks); 
                     const reader = new FileReader();
                     reader.readAsDataURL(audioBlob);
-                    reader.onloadend = () => sendFinal(reader.result);
+                    reader.onloadend = () => {
+                        // Ajout du tag [AUDIO] pour bien l'identifier à la lecture
+                        sendFinal("[AUDIO]" + reader.result);
+                    };
                 };
                 mediaRecorder.start(); isRecording = true;
                 recordBtn.classList.add('recording');
-            } catch(err) { alert("Microphone refusé."); }
+            } catch(err) { alert("Microphone refusé ou indisponible."); }
         };
 
         const stopRecord = (e) => {
@@ -479,7 +545,7 @@
         recordBtn.addEventListener('touchstart', startRecord);
         recordBtn.addEventListener('touchend', stopRecord);
 
-        // GIFS GIPHY
+        // GIFS (API Tenor fiable)
         document.getElementById('toggle-gif').onclick = () => {
             const p = document.getElementById('gif-panel'); p.style.display = p.style.display === 'flex' ? 'none' : 'flex';
             if (p.style.display === 'flex') searchGifs('trending');
@@ -487,15 +553,15 @@
 
         async function searchGifs(term) {
             try {
-                const url = term === 'trending' ? `https://api.giphy.com/v1/gifs/trending?api_key=GlVGYHqc3SyCEGpoJCzO02E2pQf8J37i&limit=12` : `https://api.giphy.com/v1/gifs/search?api_key=GlVGYHqc3SyCEGpoJCzO02E2pQf8J37i&q=${term}&limit=12`;
+                const url = term === 'trending' ? `https://g.tenor.com/v1/trending?key=LIVDSRZULECB&limit=12` : `https://g.tenor.com/v1/search?key=LIVDSRZULECB&q=${term}&limit=12`;
                 const resp = await fetch(url); const data = await resp.json();
                 const resDiv = document.getElementById('gif-results'); resDiv.innerHTML = '';
-                if(data.data) { data.data.forEach(g => {
-                    const img = document.createElement('img'); img.src = g.images.fixed_height_small.url;
-                    img.onclick = () => { sendFinal(g.images.fixed_height.url); document.getElementById('gif-panel').style.display = 'none'; };
+                if(data.results) { data.results.forEach(g => {
+                    const img = document.createElement('img'); img.src = g.media[0].tinygif.url;
+                    img.onclick = () => { sendFinal(g.media[0].gif.url); document.getElementById('gif-panel').style.display = 'none'; };
                     resDiv.appendChild(img);
                 });}
-            } catch(e) { alert("Erreur réseau pour les GIFs"); }
+            } catch(e) { console.error("Erreur réseau pour les GIFs", e); }
         }
         document.getElementById('gif-search').oninput = (e) => searchGifs(e.target.value || 'trending');
 
@@ -504,7 +570,6 @@
             if(messagesUnsub) messagesUnsub(); if(unreadUnsub) unreadUnsub();
             updateDoc(doc(db, "users", currentUser), { isTyping: false }); showView('chat-selection');
         };
-        document.getElementById('username-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') document.getElementById('go-to-pin').click(); });
     </script>
 </body>
 </html>
