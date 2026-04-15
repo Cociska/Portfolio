@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>Messagerie | Adam Kattouf</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --bg-color: #E8E6E1; --accent-color: #8B5E3C; --text-dark: #2D2D2D; --card-bg: #FFFFFF; }
+        
+        /* Structure Web App plein écran (100dvh gère la barre de nav mobile) */
+        body { 
+            background-color: #f9f9f9; color: var(--text-dark); font-family: 'Roboto', sans-serif; 
+            margin: 0; padding: 0; height: 100dvh; display: flex; flex-direction: column; overflow: hidden;
+        }
+
+        .btn { padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer; border: none; font-size: 1rem; font-family: 'Roboto', sans-serif; }
+        .btn-primary { background: var(--text-dark); color: white; }
+
+        /* Le Header de l'app */
+        .chat-header { 
+            background: var(--text-dark); color: white; padding: 15px 20px; 
+            display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 10;
+        }
+        .chat-header h3 { margin: 0; font-family: 'Montserrat', sans-serif; font-size: 1.2rem; }
+        .header-btn { color: white; text-decoration: none; font-size: 1.5rem; }
+
+        /* Les différents écrans (prennent le reste de l'espace) */
+        .app-view { flex: 1; display: none; flex-direction: column; overflow: hidden; }
+        .app-view.active { display: flex; }
+
+        /* Login & PIN */
+        .chat-login { padding: 30px; align-items: center; justify-content: center; text-align: center; }
+        .chat-login input { 
+            padding: 12px; border-radius: 8px; border: 1px solid #ccc; width: 80%; max-width: 300px; 
+            margin-bottom: 20px; outline: none; 
+            font-size: 16px !important; /* EMPÊCHE LE ZOOM iOS */
+        }
+        
+        .pin-wrapper { position: relative; width: 200px; height: 50px; margin: 20px auto; }
+        .pin-dots-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: space-between; align-items: center; pointer-events: none; }
+        .pin-dot { width: 18px; height: 18px; border: 2px solid #ccc; border-radius: 50%; transition: 0.2s; }
+        .pin-dot.filled { background: var(--accent-color); border-color: var(--accent-color); transform: scale(1.1); }
+        .hidden-pin-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: text; z-index: 10; font-size: 16px !important; }
+
+        /* Liste Users */
+        .chat-selection { overflow-y: auto; background: white; }
+        .user-item { padding: 15px 20px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; flex-direction: column; gap: 5px; transition: 0.2s; }
+        .user-item:active { background: #f0ede9; }
+        .user-item.unread { background: #fdfbf8; border-left: 4px solid var(--accent-color); }
+        .user-top { display: flex; justify-content: space-between; align-items: center; }
+        .user-name { font-size: 1.05rem; font-weight: bold; }
+        .user-item:not(.unread) .user-name { font-weight: normal; }
+        .user-time { font-size: 0.8rem; color: #888; }
+        .user-preview { font-size: 0.9rem; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Chat Interface */
+        .chat-interface-header { 
+            background: #f0ede9; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd;
+        }
+        .header-info { display: flex; flex-direction: column; }
+        .header-name { font-weight: bold; font-size: 1rem; color: var(--text-dark); }
+        .typing-box { font-size: 0.75rem; color: var(--accent-color); font-style: italic; min-height: 15px; margin-top: 2px;}
+
+        .messages-list { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; background: white; }
+        .message { max-width: 80%; padding: 10px 15px; border-radius: 18px; font-size: 0.95rem; position: relative; word-wrap: break-word; line-height: 1.4; }
+        .message.mine { background: var(--accent-color); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .message.other { background: #f0f0f0; align-self: flex-start; border-bottom-left-radius: 4px; }
+        .read-status { font-size: 0.75rem; align-self: flex-end; margin-top: -6px; margin-right: 5px; color: #888; }
+
+        .chat-input-area { display: flex; gap: 10px; padding: 10px 15px; background: white; border-top: 1px solid #eee; padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
+        .chat-input-area input { 
+            flex: 1; padding: 12px 18px; border-radius: 25px; border: 1px solid #ddd; outline: none; background: #f9f9f9;
+            font-size: 16px !important; /* EMPÊCHE LE ZOOM iOS */
+        }
+        .chat-input-area input:focus { border-color: var(--accent-color); background: white; }
+        .send-btn { 
+            background: var(--accent-color); color: white; border: none; border-radius: 50%; width: 45px; height: 45px; 
+            display: flex; align-items: center; justify-content: center; font-size: 1.1rem; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chat-header">
+        <a href="index.html" class="header-btn"><i class="fas fa-home" style="font-size: 1.2rem;"></i></a>
+        <h3 id="main-title">Messagerie</h3>
+        <div style="width: 24px;"></div> </div>
+
+    <div class="app-view active chat-login" id="chat-step-user">
+        <h2 style="margin-top:0;">Identifiez-vous</h2>
+        <p style="color: #666; margin-bottom: 25px;">Pour discuter avec Adam et ses amis.</p>
+        <input type="text" id="username-input" placeholder="Votre pseudo..." autocomplete="off">
+        <button class="btn btn-primary" id="go-to-pin" style="width: 80%; max-width: 300px;">Continuer</button>
+    </div>
+
+    <div class="app-view chat-login" id="chat-step-pin">
+        <h2 style="margin-top:0;">Code Secret</h2>
+        <p style="color: #666;">Ce code lie votre pseudo à cet appareil.</p>
+        <div class="pin-wrapper">
+            <input type="password" id="hidden-pin-input" class="hidden-pin-input" maxlength="6" inputmode="numeric">
+            <div class="pin-dots-container">
+                <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+                <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-view chat-selection" id="chat-selection">
+        <div id="user-list-container"></div>
+    </div>
+
+    <div class="app-view" id="chat-interface">
+        <div class="chat-interface-header">
+            <button id="back-btn" style="border:none; background:none; cursor:pointer; font-size: 1.2rem; color:var(--text-dark); padding: 5px;"><i class="fas fa-chevron-left"></i></button>
+            <div class="header-info" style="align-items: center; flex: 1;">
+                <span id="target-name" class="header-name"></span>
+                <span id="typing-box" class="typing-box"></span>
+            </div>
+            <div style="width: 24px;"></div> </div>
+        <div class="messages-list" id="messages-list"></div>
+        <div class="chat-input-area">
+            <input type="text" id="msg-input" placeholder="Message..." autocomplete="off">
+            <button id="send-btn" class="send-btn"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc, getDoc, updateDoc, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAuXwoROo6ZCjZWDLq79XKzUD7oS3ws7nM",
+            authDomain: "portfolio-adam-1577e.firebaseapp.com",
+            projectId: "portfolio-adam-1577e",
+            storageBucket: "portfolio-adam-1577e.firebasestorage.app",
+            messagingSenderId: "282859266513",
+            appId: "1:282859266513:web:54366df533eab3ee2980f0"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let currentUser = "";
+        let currentTarget = "";
+        let messagesUnsub = null;
+        let unreadUnsub = null;
+
+        // --- NAVIGATION VUES ---
+        function showView(viewId) {
+            document.querySelectorAll('.app-view').forEach(el => el.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+        }
+
+        // --- GESTION PIN REVOLUT ---
+        const pinInput = document.getElementById('hidden-pin-input');
+        const dots = document.querySelectorAll('.pin-dot');
+
+        document.getElementById('go-to-pin').onclick = () => {
+            const user = document.getElementById('username-input').value.trim();
+            if(user && !user.startsWith('[')) {
+                currentUser = user;
+                showView('chat-step-pin');
+                setTimeout(() => pinInput.focus(), 100);
+            }
+        };
+
+        pinInput.oninput = async () => {
+            pinInput.value = pinInput.value.replace(/[^0-9]/g, '');
+            const val = pinInput.value;
+            dots.forEach((dot, i) => dot.classList.toggle('filled', i < val.length));
+            
+            if(val.length === 6) {
+                const userRef = doc(db, "users", currentUser);
+                const snap = await getDoc(userRef);
+                
+                if(snap.exists() && snap.data().pin !== val) {
+                    alert("Code secret incorrect !");
+                    pinInput.value = "";
+                    dots.forEach(d => d.classList.remove('filled'));
+                } else {
+                    await setDoc(userRef, { username: currentUser, pin: val, lastSeen: serverTimestamp(), isTyping: false }, {merge:true});
+                    showView('chat-selection');
+                    initUserList();
+                }
+            }
+        };
+
+        document.getElementById('username-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') document.getElementById('go-to-pin').click();
+        });
+
+        // --- LISTE DES UTILISATEURS ---
+        function initUserList() {
+            onSnapshot(collection(db, "users"), (usersSnap) => {
+                onSnapshot(query(collection(db, "messages"), orderBy("timestamp", "desc")), (msgSnap) => {
+                    const allMsgs = msgSnap.docs.map(d => d.data());
+                    const listContainer = document.getElementById('user-list-container');
+                    listContainer.innerHTML = '';
+
+                    const users = [];
+                    usersSnap.forEach(u => {
+                        const uname = u.data().username;
+                        if(uname === currentUser) return;
+                        
+                        const chatId = [currentUser, uname].sort().join('_');
+                        const lastMsg = allMsgs.find(m => m.chatId === chatId);
+                        const unread = allMsgs.some(m => m.chatId === chatId && m.user !== currentUser && !m.read);
+                        users.push({ ...u.data(), lastMsg, unread });
+                    });
+
+                    users.sort((a, b) => (b.lastMsg?.timestamp?.seconds || 0) - (a.lastMsg?.timestamp?.seconds || 0));
+
+                    const globalMsg = allMsgs.find(m => m.chatId === "Global");
+                    renderUserItem({ username: "Global", lastMsg: globalMsg }, true);
+
+                    users.forEach(u => renderUserItem(u));
+                });
+            });
+        }
+
+        function renderUserItem(data, isGlobal = false) {
+            const item = document.createElement('div');
+            item.className = `user-item ${data.unread ? 'unread' : ''}`;
+            
+            const timeAgo = data.lastMsg?.timestamp ? formatTime(data.lastMsg.timestamp) : "";
+            const preview = data.lastMsg ? (data.lastMsg.user === currentUser ? `Vous: ${data.lastMsg.text}` : data.lastMsg.text) : "Appuyer pour discuter";
+
+            item.innerHTML = `
+                <div class="user-top"><span class="user-name">${isGlobal ? "🌍 Salon Global" : data.username}</span><span class="user-time">${timeAgo}</span></div>
+                <div class="user-preview">${preview}</div>
+            `;
+            item.onclick = () => openChat(data.username);
+            document.getElementById('user-list-container').appendChild(item);
+        }
+
+        // --- CHAT LOGIQUE ---
+        async function openChat(target) {
+            currentTarget = target;
+            showView('chat-interface');
+            document.getElementById('target-name').innerText = target === "Global" ? "🌍 Salon Global" : target;
+            document.getElementById('typing-box').innerText = ""; 
+            
+            const chatId = target === "Global" ? "Global" : [currentUser, target].sort().join('_');
+            
+            if(unreadUnsub) unreadUnsub(); 
+            const qUnread = query(collection(db, "messages"), where("chatId", "==", chatId), where("read", "==", false));
+            unreadUnsub = onSnapshot(qUnread, (snap) => {
+                snap.forEach(d => { if (d.data().user !== currentUser) updateDoc(doc(db, "messages", d.id), { read: true }); });
+            });
+
+            if(messagesUnsub) messagesUnsub();
+            messagesUnsub = onSnapshot(query(collection(db, "messages"), orderBy("timestamp", "asc")), (snap) => {
+                const list = document.getElementById('messages-list');
+                list.innerHTML = '';
+                let lastMine = null;
+
+                snap.forEach(d => {
+                    const m = d.data();
+                    if(m.chatId === chatId) {
+                        const div = document.createElement('div');
+                        div.className = `message ${m.user === currentUser ? 'mine' : 'other'}`;
+                        div.innerText = m.text;
+                        list.appendChild(div);
+                        if(m.user === currentUser) lastMine = m;
+                    }
+                });
+                
+                if(lastMine && lastMine.read && target !== "Global") {
+                    const lu = document.createElement('div'); lu.className = 'read-status'; lu.innerText = "Lu";
+                    list.appendChild(lu);
+                }
+                list.scrollTop = list.scrollHeight;
+            });
+
+            if (target !== "Global") {
+                onSnapshot(doc(db, "users", target), (d) => {
+                    document.getElementById('typing-box').innerText = (d.exists() && d.data().isTyping) ? `en train d'écrire...` : "";
+                });
+            }
+        }
+
+        // --- ENVOI & TYPING ---
+        const msgInput = document.getElementById('msg-input');
+        
+        msgInput.oninput = () => {
+            const isTextPresent = msgInput.value.trim().length > 0;
+            updateDoc(doc(db, "users", currentUser), { isTyping: isTextPresent });
+        };
+
+        document.getElementById('send-btn').onclick = async () => {
+            const text = msgInput.value.trim();
+            if(!text) return;
+            msgInput.value = "";
+            const chatId = currentTarget === "Global" ? "Global" : [currentUser, currentTarget].sort().join('_');
+            
+            await addDoc(collection(db, "messages"), { user: currentUser, text: text, chatId: chatId, read: false, timestamp: serverTimestamp() });
+            updateDoc(doc(db, "users", currentUser), { isTyping: false });
+        };
+
+        document.getElementById('msg-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') document.getElementById('send-btn').click();
+        });
+
+        document.getElementById('back-btn').onclick = () => {
+            if(messagesUnsub) messagesUnsub();
+            if(unreadUnsub) unreadUnsub(); 
+            updateDoc(doc(db, "users", currentUser), { isTyping: false });
+            document.getElementById('msg-input').value = ""; 
+            showView('chat-selection');
+        };
+
+        function formatTime(ts) {
+            const sec = Math.floor((new Date() - ts.toDate()) / 1000);
+            if(sec < 60) return "à l'instant";
+            if(sec < 3600) return `il y a ${Math.floor(sec/60)} min`;
+            if(sec < 86400) return `il y a ${Math.floor(sec/3600)} h`;
+            return `il y a ${Math.floor(sec/86400)} j`;
+        }
+    </script>
+</body>
+</html>

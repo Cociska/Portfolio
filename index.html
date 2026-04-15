@@ -7,96 +7,29 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* =========================================
-           TON CSS ORIGINAL DU PORTFOLIO
-           ========================================= */
-        :root {
-            --bg-color: #E8E6E1;
-            --accent-color: #8B5E3C;
-            --text-dark: #2D2D2D;
-            --card-bg: #FFFFFF;
-        }
-
+        :root { --bg-color: #E8E6E1; --accent-color: #8B5E3C; --text-dark: #2D2D2D; --card-bg: #FFFFFF; }
         body { background-color: var(--bg-color); color: var(--text-dark); font-family: 'Roboto', sans-serif; margin: 0; line-height: 1.6; }
-
         header { height: 60vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
         h1 { font-family: 'Montserrat', sans-serif; font-size: 3rem; text-transform: uppercase; margin-bottom: 10px; letter-spacing: -1px; }
         .badge { background-color: var(--accent-color); color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; text-transform: uppercase; margin-bottom: 20px; }
         .intro { max-width: 600px; font-size: 1.1rem; color: #555; }
         .cta-container { margin-top: 30px; }
-
         .btn { text-decoration: none; padding: 12px 25px; border-radius: 5px; font-weight: bold; transition: 0.3s; display: inline-block; margin: 5px; cursor: pointer; border: none; font-size: 1rem; font-family: 'Roboto', sans-serif;}
         .btn-primary { background: var(--text-dark); color: white; }
         .btn-primary:hover { background: var(--accent-color); }
         .btn-secondary { border: 2px solid var(--text-dark); color: var(--text-dark); background: transparent;}
         .btn-secondary:hover { background: var(--text-dark); color: white; }
-
         section { max-width: 1000px; margin: 0 auto; padding: 50px 20px; }
         h2 { font-family: 'Montserrat', sans-serif; text-transform: uppercase; border-bottom: 3px solid var(--accent-color); display: inline-block; margin-bottom: 30px; }
-        
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
         .card { background: var(--card-bg); padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: transform 0.3s; }
         .card:hover { transform: translateY(-5px); }
         .card i { font-size: 2rem; color: var(--accent-color); margin-bottom: 15px; }
         .card h3 { margin-top: 0; font-family: 'Montserrat', sans-serif; }
-        
         .tags { margin-top: 15px; }
         .tag { font-size: 0.75rem; background: #eee; padding: 3px 8px; border-radius: 4px; margin-right: 5px; font-weight: bold; }
-        
         footer { text-align: center; padding: 40px; font-size: 0.9rem; color: #777; }
-
         @media (max-width: 600px) { h1 { font-size: 2rem; } }
-
-        /* =========================================
-           CSS MESSAGERIE V6 (Corrections des bugs)
-           ========================================= */
-        .chat-popup {
-            position: fixed; bottom: 20px; right: 20px; width: 380px; max-width: 90vw; height: 500px;
-            background: var(--card-bg); border-radius: 15px; box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-            display: flex; flex-direction: column; overflow: hidden; transform: translateY(150%);
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 1000;
-        }
-        .chat-popup.active { transform: translateY(0); }
-
-        .chat-header { background: var(--text-dark); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .chat-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #f9f9f9; }
-
-        /* --- Ecran Login & PIN --- */
-        .chat-login { padding: 30px; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; }
-        
-        .pin-wrapper { position: relative; width: 160px; height: 40px; margin: 20px auto; }
-        .pin-dots-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: space-between; align-items: center; pointer-events: none; }
-        .pin-dot { width: 15px; height: 15px; border: 2px solid #ccc; border-radius: 50%; transition: 0.2s; }
-        .pin-dot.filled { background: var(--accent-color); border-color: var(--accent-color); transform: scale(1.2); }
-        .hidden-pin-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: text; z-index: 10; font-size: 24px; letter-spacing: 20px; }
-
-        /* --- Ecran Liste Users --- */
-        .chat-selection { display: none; flex-direction: column; height: 100%; overflow-y: auto; }
-        .user-item { padding: 12px 15px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; flex-direction: column; gap: 4px; transition: 0.2s; }
-        .user-item:hover { background: #f0ede9; }
-        .user-item.unread { font-weight: bold; background: #fff; border-left: 4px solid var(--accent-color); }
-        .user-top { display: flex; justify-content: space-between; align-items: center; }
-        .user-name { font-size: 0.95rem; }
-        .user-time { font-size: 0.75rem; color: #888; font-weight: normal; }
-        .user-preview { font-size: 0.8rem; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; font-weight: normal; }
-
-        /* --- Ecran Chat --- */
-        .chat-messages-container { display: none; flex-direction: column; height: 100%; }
-        
-        .chat-interface-header { background: #E8E6E1; padding: 8px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
-        .header-info { display: flex; flex-direction: column; }
-        .header-name { font-weight: bold; font-size: 0.9rem; color: var(--text-dark); }
-        .typing-box { font-size: 0.7rem; color: var(--accent-color); font-style: italic; min-height: 14px; margin-top: 2px;}
-
-        .messages-list { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 8px; }
-        .message { max-width: 80%; padding: 8px 12px; border-radius: 12px; font-size: 0.9rem; position: relative; }
-        .message.mine { background: var(--accent-color); color: white; align-self: flex-end; }
-        .message.other { background: #eee; align-self: flex-start; }
-        .read-status { font-size: 0.7rem; align-self: flex-end; margin-top: -5px; margin-right: 5px; color: #888; }
-
-        .chat-input-area { display: flex; gap: 10px; padding: 10px; border-top: 1px solid #eee; background: white; }
-        .chat-input-area input { flex: 1; padding: 10px; border-radius: 20px; border: 1px solid #ddd; outline: none; }
-        .chat-input-area input:focus { border-color: var(--accent-color); }
     </style>
 </head>
 <body>
@@ -108,7 +41,7 @@
         <div class="cta-container">
             <a href="cv.html" class="btn btn-primary"><i class="fas fa-file-pdf"></i> Voir mon CV</a>
             <a href="https://github.com/Cociska" class="btn btn-secondary"><i class="fab fa-github"></i> GitHub</a>
-            <button id="open-chat-btn" class="btn btn-secondary"><i class="fas fa-comment-dots"></i> Messagerie</button>
+            <a href="chat.html" class="btn btn-secondary"><i class="fas fa-comment-dots"></i> Messagerie</a>
         </div>
     </header>
 
@@ -140,272 +73,5 @@
         <p>2026 Adam Kattouf - Hébergé sur mon infrastructure personnelle</p>
     </footer>
 
-    <div class="chat-popup" id="chat-popup">
-        <div class="chat-header">
-            <h3 id="header-title" style="margin:0; font-family:'Montserrat', sans-serif;">Connexion</h3>
-            <button style="background:none; border:none; color:white; cursor:pointer; font-size: 1.2rem;" id="close-chat-btn"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="chat-body">
-            
-            <div class="chat-login" id="chat-step-user">
-                <p style="font-weight:bold; margin-top:0;">Choisissez un pseudo</p>
-                <input type="text" id="username-input" placeholder="Votre pseudo..." style="padding:10px; border-radius:5px; border:1px solid #ccc; width:80%; margin-bottom: 15px; outline:none;" autocomplete="off">
-                <button class="btn btn-primary" id="go-to-pin">Suivant</button>
-            </div>
-
-            <div class="chat-login" id="chat-step-pin" style="display:none;">
-                <p style="font-weight:bold; margin-top:0;">Entrez votre code secret</p>
-                
-                <div class="pin-wrapper">
-                    <input type="password" id="hidden-pin-input" class="hidden-pin-input" maxlength="6" inputmode="numeric">
-                    <div class="pin-dots-container">
-                        <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
-                        <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
-                    </div>
-                </div>
-                
-                <p style="font-size:0.75rem; color:#666;">Ce code sera lié à votre pseudo.</p>
-            </div>
-
-            <div class="chat-selection" id="chat-selection">
-                <div id="user-list-container"></div>
-            </div>
-
-            <div class="chat-messages-container" id="chat-interface">
-                <div class="chat-interface-header">
-                    <div class="header-info">
-                        <span id="target-name" class="header-name"></span>
-                        <span id="typing-box" class="typing-box"></span>
-                    </div>
-                    <button id="back-btn" style="border:none; background:none; cursor:pointer; font-weight:bold; color:var(--text-dark);">Retour</button>
-                </div>
-                <div class="messages-list" id="messages-list"></div>
-                <div class="chat-input-area">
-                    <input type="text" id="msg-input" placeholder="Message..." autocomplete="off">
-                    <button id="send-btn" class="btn btn-primary" style="border-radius:50%; width:40px; height:40px; padding:0; display:flex; align-items:center; justify-content:center;"><i class="fas fa-paper-plane"></i></button>
-                </div>
-            </div>
-            
-        </div>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc, getDoc, updateDoc, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyAuXwoROo6ZCjZWDLq79XKzUD7oS3ws7nM",
-            authDomain: "portfolio-adam-1577e.firebaseapp.com",
-            projectId: "portfolio-adam-1577e",
-            storageBucket: "portfolio-adam-1577e.firebasestorage.app",
-            messagingSenderId: "282859266513",
-            appId: "1:282859266513:web:54366df533eab3ee2980f0"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        let currentUser = "";
-        let currentTarget = "";
-        let messagesUnsub = null;
-        let unreadUnsub = null; // Variable pour stocker et stopper l'écoute des messages non lus
-
-        // --- GESTION PIN REVOLUT ---
-        const pinInput = document.getElementById('hidden-pin-input');
-        const dots = document.querySelectorAll('.pin-dot');
-
-        document.getElementById('go-to-pin').onclick = () => {
-            const user = document.getElementById('username-input').value.trim();
-            if(user && !user.startsWith('[')) {
-                currentUser = user;
-                document.getElementById('chat-step-user').style.display = 'none';
-                document.getElementById('chat-step-pin').style.display = 'flex';
-                setTimeout(() => pinInput.focus(), 100);
-            }
-        };
-
-        pinInput.oninput = async () => {
-            pinInput.value = pinInput.value.replace(/[^0-9]/g, '');
-            const val = pinInput.value;
-            
-            dots.forEach((dot, i) => dot.classList.toggle('filled', i < val.length));
-            
-            if(val.length === 6) {
-                const userRef = doc(db, "users", currentUser);
-                const snap = await getDoc(userRef);
-                
-                if(snap.exists() && snap.data().pin !== val) {
-                    alert("Code secret incorrect !");
-                    pinInput.value = "";
-                    dots.forEach(d => d.classList.remove('filled'));
-                } else {
-                    await setDoc(userRef, { username: currentUser, pin: val, lastSeen: serverTimestamp(), isTyping: false }, {merge:true});
-                    document.getElementById('chat-step-pin').style.display = 'none';
-                    document.getElementById('chat-selection').style.display = 'flex';
-                    document.getElementById('header-title').innerText = "Messages";
-                    initUserList();
-                }
-            }
-        };
-
-        document.getElementById('username-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') document.getElementById('go-to-pin').click();
-        });
-
-        // --- LISTE DES UTILISATEURS & TRI ---
-        function initUserList() {
-            onSnapshot(collection(db, "users"), (usersSnap) => {
-                onSnapshot(query(collection(db, "messages"), orderBy("timestamp", "desc")), (msgSnap) => {
-                    const allMsgs = msgSnap.docs.map(d => d.data());
-                    const listContainer = document.getElementById('user-list-container');
-                    listContainer.innerHTML = '';
-
-                    const users = [];
-                    usersSnap.forEach(u => {
-                        const uname = u.data().username;
-                        if(uname === currentUser) return;
-                        
-                        const chatId = [currentUser, uname].sort().join('_');
-                        const lastMsg = allMsgs.find(m => m.chatId === chatId);
-                        const unread = allMsgs.some(m => m.chatId === chatId && m.user !== currentUser && !m.read);
-                        
-                        users.push({ ...u.data(), lastMsg, unread });
-                    });
-
-                    users.sort((a, b) => (b.lastMsg?.timestamp?.seconds || 0) - (a.lastMsg?.timestamp?.seconds || 0));
-
-                    const globalMsg = allMsgs.find(m => m.chatId === "Global");
-                    renderUserItem({ username: "Global", lastMsg: globalMsg }, true);
-
-                    users.forEach(u => renderUserItem(u));
-                });
-            });
-        }
-
-        function renderUserItem(data, isGlobal = false) {
-            const item = document.createElement('div');
-            item.className = `user-item ${data.unread ? 'unread' : ''}`;
-            
-            const timeAgo = data.lastMsg?.timestamp ? formatTime(data.lastMsg.timestamp) : "";
-            const preview = data.lastMsg 
-                ? (data.lastMsg.user === currentUser ? `Vous: ${data.lastMsg.text}` : data.lastMsg.text)
-                : "Appuyer pour discuter";
-
-            item.innerHTML = `
-                <div class="user-top">
-                    <span class="user-name">${isGlobal ? "🌍 Salon Global" : data.username}</span>
-                    <span class="user-time">${timeAgo}</span>
-                </div>
-                <div class="user-preview">${preview}</div>
-            `;
-            item.onclick = () => openChat(data.username);
-            document.getElementById('user-list-container').appendChild(item);
-        }
-
-        // --- CHAT LOGIQUE ---
-        async function openChat(target) {
-            currentTarget = target;
-            document.getElementById('chat-selection').style.display = 'none';
-            document.getElementById('chat-interface').style.display = 'flex';
-            document.getElementById('target-name').innerText = target === "Global" ? "🌍 Salon Global" : target;
-            document.getElementById('typing-box').innerText = ""; 
-            
-            const chatId = target === "Global" ? "Global" : [currentUser, target].sort().join('_');
-            
-            // Marquer comme lu (CORRIGÉ : on nettoie l'ancien écouteur s'il y en avait un)
-            if(unreadUnsub) unreadUnsub(); 
-            const qUnread = query(collection(db, "messages"), where("chatId", "==", chatId), where("read", "==", false));
-            unreadUnsub = onSnapshot(qUnread, (snap) => {
-                snap.forEach(d => {
-                    if (d.data().user !== currentUser) {
-                        updateDoc(doc(db, "messages", d.id), { read: true });
-                    }
-                });
-            });
-
-            // Ecouter les messages
-            if(messagesUnsub) messagesUnsub();
-            messagesUnsub = onSnapshot(query(collection(db, "messages"), orderBy("timestamp", "asc")), (snap) => {
-                const list = document.getElementById('messages-list');
-                list.innerHTML = '';
-                let lastMine = null;
-
-                snap.forEach(d => {
-                    const m = d.data();
-                    if(m.chatId === chatId) {
-                        const div = document.createElement('div');
-                        div.className = `message ${m.user === currentUser ? 'mine' : 'other'}`;
-                        div.innerText = m.text;
-                        list.appendChild(div);
-                        if(m.user === currentUser) lastMine = m;
-                    }
-                });
-                
-                if(lastMine && lastMine.read && target !== "Global") {
-                    const lu = document.createElement('div'); 
-                    lu.className = 'read-status'; 
-                    lu.innerText = "Lu";
-                    list.appendChild(lu);
-                }
-                list.scrollTop = list.scrollHeight;
-            });
-
-            if (target !== "Global") {
-                onSnapshot(doc(db, "users", target), (d) => {
-                    const typingBox = document.getElementById('typing-box');
-                    typingBox.innerText = (d.exists() && d.data().isTyping) ? `en train d'écrire...` : "";
-                });
-            }
-        }
-
-        // --- ENVOI & TYPING ---
-        const msgInput = document.getElementById('msg-input');
-        
-        // NOUVELLE LOGIQUE "EN TRAIN D'ECRIRE" : S'il y a du texte, c'est true. Sinon, c'est false.
-        msgInput.oninput = () => {
-            const isTextPresent = msgInput.value.trim().length > 0;
-            updateDoc(doc(db, "users", currentUser), { isTyping: isTextPresent });
-        };
-
-        document.getElementById('send-btn').onclick = async () => {
-            const text = msgInput.value.trim();
-            if(!text) return;
-            msgInput.value = "";
-            const chatId = currentTarget === "Global" ? "Global" : [currentUser, currentTarget].sort().join('_');
-            
-            await addDoc(collection(db, "messages"), {
-                user: currentUser, text: text, chatId: chatId, read: false, timestamp: serverTimestamp()
-            });
-            updateDoc(doc(db, "users", currentUser), { isTyping: false });
-        };
-
-        document.getElementById('msg-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') document.getElementById('send-btn').click();
-        });
-
-        // --- RETOUR AU MENU (CORRIGÉ : on coupe l'écoute des "messages lus" en sortant) ---
-        document.getElementById('back-btn').onclick = () => {
-            if(messagesUnsub) messagesUnsub();
-            if(unreadUnsub) unreadUnsub(); // Stoppe le marquage "Lu" en arrière-plan
-            
-            // On s'assure d'effacer le statut de frappe et l'input
-            updateDoc(doc(db, "users", currentUser), { isTyping: false });
-            document.getElementById('msg-input').value = ""; 
-            
-            document.getElementById('chat-interface').style.display = 'none';
-            document.getElementById('chat-selection').style.display = 'flex';
-        };
-
-        document.getElementById('open-chat-btn').onclick = () => document.getElementById('chat-popup').classList.add('active');
-        document.getElementById('close-chat-btn').onclick = () => document.getElementById('chat-popup').classList.remove('active');
-
-        function formatTime(ts) {
-            const sec = Math.floor((new Date() - ts.toDate()) / 1000);
-            if(sec < 60) return "à l'instant";
-            if(sec < 3600) return `il y a ${Math.floor(sec/60)} min`;
-            if(sec < 86400) return `il y a ${Math.floor(sec/3600)} h`;
-            return `il y a ${Math.floor(sec/86400)} j`;
-        }
-    </script>
 </body>
 </html>
