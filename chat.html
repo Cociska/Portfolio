@@ -527,32 +527,68 @@
         sendTextBtn.onclick = () => { const t = msgInput.value.trim(); if(t) { sendFinal(t); msgInput.value = ""; msgInput.oninput(); } };
         msgInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendTextBtn.click(); });
 
-        // LOGIQUE MESSAGES VOCAUX 
-        let mediaRecorder; let audioChunks = []; let isRecording = false;
+        // LOGIQUE MESSAGES VOCAUX - Avec meilleure gestion 
+        let mediaRecorder; let audioChunks = []; let isRecording = false; let recordingStartTime = 0;
+        const MAX_RECORDING_TIME = 30000; // 30 secondes max
+        let recordingTimer = null;
         
         const startRecord = async (e) => {
             e.preventDefault();
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream); 
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: { 
+                        sampleRate: 16000,  // Réduire la qualité pour moins de données
+                        echoCancellation: true,
+                        noiseSuppression: true
+                    } 
+                });
+                mediaRecorder = new MediaRecorder(stream, { 
+                    mimeType: 'audio/webm;codecs=opus',
+                    audioBitsPerSecond: 64000  // Bitrate réduit
+                }); 
                 audioChunks = [];
+                recordingStartTime = Date.now();
+                
                 mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-                mediaRecorder.onstop = () => {
-                    const audioBlob = new Blob(audioChunks); 
+                mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    
+                    // Vérifier la taille
+                    if(audioBlob.size > 500000) {
+                        alert("Vocal trop volumineux. Réenregistrez plus court.");
+                        return;
+                    }
+                    
                     const reader = new FileReader();
                     reader.readAsDataURL(audioBlob);
-                    reader.onloadend = () => sendFinal("[AUDIO]" + reader.result);
+                    reader.onerror = () => alert("Erreur lors du traitement du vocal");
+                    reader.onloadend = () => {
+                        if(reader.result) {
+                            sendFinal("[AUDIO]" + reader.result);
+                        }
+                    };
                 };
-                mediaRecorder.start(); isRecording = true;
+                mediaRecorder.start(500); // Rapporter les données tous les 500ms
+                isRecording = true;
                 recordBtn.classList.add('recording');
-            } catch(err) { alert("Microphone refusé ou indisponible."); }
+                
+                // Stop automatique après 30 secondes
+                recordingTimer = setTimeout(() => stopRecord({preventDefault: () => {}}), MAX_RECORDING_TIME);
+                
+            } catch(err) { 
+                alert("Microphone refusé. Vérifiez les permissions.");
+                console.error("Microphone error:", err);
+            }
         };
 
         const stopRecord = (e) => {
             e.preventDefault();
             if(isRecording && mediaRecorder) {
-                mediaRecorder.stop(); mediaRecorder.stream.getTracks().forEach(t => t.stop());
-                isRecording = false; recordBtn.classList.remove('recording');
+                if(recordingTimer) clearTimeout(recordingTimer);
+                if(mediaRecorder.state !== 'inactive') mediaRecorder.stop(); 
+                mediaRecorder.stream.getTracks().forEach(t => t.stop());
+                isRecording = false; 
+                recordBtn.classList.remove('recording');
             }
         };
 
@@ -562,7 +598,7 @@
         recordBtn.addEventListener('touchstart', startRecord);
         recordBtn.addEventListener('touchend', stopRecord);
 
-        // GIFS GIPHY OFFICIEL
+        // GIFS TENOR API (Plus fiable)
         document.getElementById('toggle-gif').onclick = () => {
             const p = document.getElementById('gif-panel'); p.style.display = p.style.display === 'flex' ? 'none' : 'flex';
             if (p.style.display === 'flex') searchGifs('trending');
@@ -570,20 +606,34 @@
 
         async function searchGifs(term) {
             try {
-                const apiKey = "dc6zaTOxFJmzC"; // Clé Beta Publique
-                const url = term === 'trending' ? `https://api.giphy.com/v1/gifs/trending?api_key=${apiKey}&limit=12` : `https://api.giphy.com/v1/gifs/search?api_key=${apiKey}&q=${term}&limit=12`;
-                const resp = await fetch(url); const data = await resp.json();
-                const resDiv = document.getElementById('gif-results'); resDiv.innerHTML = '';
-                if(data.data && data.data.length > 0) { 
-                    data.data.forEach(g => {
-                        const img = document.createElement('img'); img.src = g.images.fixed_height_small.url;
-                        img.onclick = () => { sendFinal(g.images.fixed_height.url); document.getElementById('gif-panel').style.display = 'none'; };
+                const resDiv = document.getElementById('gif-results'); 
+                resDiv.innerHTML = '<p style="text-align:center; grid-column:span 3;">Chargement...</p>';
+                
+                const url = term === 'trending' 
+                    ? `https://tenor.googleapis.com/v2/featured?key=AIzaSyAY3aVeSmWLCY5xKUXI_Xgbb0v0K3MBeMo&limit=12` 
+                    : `https://tenor.googleapis.com/v2/search?q=${encodeURIComponent(term)}&key=AIzaSyAY3aVeSmWLCY5xKUXI_Xgbb0v0K3MBeMo&limit=12`;
+                
+                const resp = await fetch(url);
+                if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                const data = await resp.json();
+                
+                resDiv.innerHTML = '';
+                if(data.results && data.results.length > 0) { 
+                    data.results.forEach(g => {
+                        const img = document.createElement('img');
+                        img.src = g.media_formats.gif.url;
+                        img.onclick = () => { 
+                            sendFinal(g.media_formats.gif.url); 
+                            document.getElementById('gif-panel').style.display = 'none'; 
+                        };
                         resDiv.appendChild(img);
                     });
-                } else { resDiv.innerHTML = '<p style="text-align:center; grid-column:span 3;">Aucun GIF trouvé.</p>'; }
+                } else { 
+                    resDiv.innerHTML = '<p style="text-align:center; grid-column:span 3;">Aucun GIF trouvé.</p>'; 
+                }
             } catch(e) { 
-                console.error("Giphy API Error:", e);
-                document.getElementById('gif-results').innerHTML = '<p style="text-align:center; grid-column:span 3; color:red;">Erreur de connexion à Giphy.</p>';
+                console.error("GIF API Error:", e);
+                document.getElementById('gif-results').innerHTML = '<p style="text-align:center; grid-column:span 3; color:red;">Erreur : vérifiez votre connexion.</p>';
             }
         }
         document.getElementById('gif-search').oninput = (e) => searchGifs(e.target.value || 'trending');
