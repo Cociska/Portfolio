@@ -284,6 +284,7 @@
         const isAudioMessage = (text) => typeof text === 'string' && (/^\[AUDIO\]/i.test(text) || /^data:audio/i.test(text));
         const getAudioPayload = (text) => (text || '').replace(/^\[AUDIO\]/i, '');
         const isGifUrl = (text) => typeof text === 'string' && /(giphy\.com|tenor\.com|media\d*\.tenor\.com|\.gif($|\?))/i.test(text);
+        const initializedAudioPlayers = new WeakSet();
 
         function scrollMessagesToBottom() {
             const list = document.getElementById('messages-list');
@@ -530,7 +531,7 @@
                         // Reconnaissance Audio ET anciens bugs audios
                         if (isAudioMessage(m.text)) {
                             const audioSrc = getAudioPayload(m.text);
-                            const audioId = `audio-${Date.now()}-${Math.random()}`;
+                            const audioId = `audio-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
                             
                             // Créer le player audio avec des éléments DOM
                             const playerDiv = document.createElement('div');
@@ -575,7 +576,11 @@
                                 fallbackAudio.style.width = '220px';
                                 msgDiv.appendChild(fallbackAudio);
                             };
-                            audio.onloadedmetadata = () => scrollMessagesToBottom();
+                            audio.onloadedmetadata = () => {
+                                const duration = playerDiv.querySelector('.audio-time .duration');
+                                if(duration) duration.innerText = formatTime(audio.duration);
+                                scrollMessagesToBottom();
+                            };
                             
                             playerDiv.appendChild(playBtn);
                             playerDiv.appendChild(progressContainer);
@@ -586,8 +591,8 @@
                             msgDiv.style.padding = '0'; 
                             msgDiv.style.boxShadow = 'none';
                             
-                            // Initialiser le player audio immédiatement
-                            setTimeout(() => updateAudioTime(audioId), 50);
+                            // Initialiser le player audio immédiatement (une seule fois)
+                            setTimeout(() => initAudioPlayer(playerDiv), 30);
                         } 
                         else if (isGifUrl(m.text)) {
                             const img = document.createElement('img');
@@ -647,9 +652,11 @@
         const MAX_RECORDING_TIME = 30000; 
         let recordingTimer = null;
         let audioStream = null;
-        let ignoreClickUntil = 0;
-        
-        const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        let pointerDownAt = 0;
+        let holdStartedRecording = false;
+        let holdStartTimer = null;
+        let suppressNextClick = false;
+        const HOLD_TO_RECORD_DELAY = 160;
 
         const getRecorderMimeType = () => {
             const preferred = [
@@ -730,10 +737,7 @@
                 mediaRecorder.start(100);
                 isRecording = true;
                 recordBtn.classList.add('recording');
-                
-                if(isMobileDevice) {
-                    recordBtn.innerHTML = '<i class="fas fa-stop-circle"></i>';
-                }
+                recordBtn.innerHTML = '<i class="fas fa-stop-circle"></i>';
                 
                 recordingTimer = setTimeout(() => {
                     if(mediaRecorder && mediaRecorder.state !== 'inactive') {
@@ -741,7 +745,7 @@
                     }
                     isRecording = false;
                     recordBtn.classList.remove('recording');
-                    if(isMobileDevice) recordBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+                    recordBtn.innerHTML = '<i class="fas fa-microphone"></i>';
                 }, MAX_RECORDING_TIME);
                 
             } catch(err) { 
@@ -766,44 +770,66 @@
             
             isRecording = false;
             recordBtn.classList.remove('recording');
-            if(isMobileDevice) recordBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+            recordBtn.innerHTML = '<i class="fas fa-microphone"></i>';
         };
 
-        // Event listeners - Desktop VS Mobile
-        if(isMobileDevice) {
-            // Mobile: touchstart/touchend + fallback click
-            recordBtn.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                ignoreClickUntil = Date.now() + 500;
-                startRecord(e);
-            }, { passive: false });
+        // Event listeners unifies PC/mobile:
+        // 1) Maintenir appuye -> enregistre, relacher -> envoie.
+        // 2) Cliquer une fois -> demarre, recliquer -> envoie.
+        const clearHoldTimer = () => {
+            if(holdStartTimer) {
+                clearTimeout(holdStartTimer);
+                holdStartTimer = null;
+            }
+        };
 
-            recordBtn.addEventListener('touchend', (e) => {
-                e.preventDefault();
-                stopRecord(e);
-            }, { passive: false });
-
-            recordBtn.addEventListener('touchcancel', (e) => {
-                e.preventDefault();
-                stopRecord(e);
-            }, { passive: false });
-
-            recordBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if(Date.now() < ignoreClickUntil) return;
+        recordBtn.addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            pointerDownAt = Date.now();
+            holdStartedRecording = false;
+            clearHoldTimer();
+            holdStartTimer = setTimeout(async () => {
                 if(!isRecording) {
-                    startRecord(e);
-                } else {
-                    stopRecord(e);
+                    holdStartedRecording = true;
+                    suppressNextClick = true;
+                    await startRecord(e);
                 }
-            });
-        } else {
-            // Desktop: Long press
-            recordBtn.addEventListener('mousedown', startRecord);
-            recordBtn.addEventListener('mouseup', stopRecord);
-            recordBtn.addEventListener('mouseleave', stopRecord);
-        }
+            }, HOLD_TO_RECORD_DELAY);
+        });
+
+        const onPointerRelease = (e) => {
+            clearHoldTimer();
+            if(holdStartedRecording && isRecording) {
+                e.preventDefault();
+                stopRecord(e);
+            }
+            setTimeout(() => { holdStartedRecording = false; }, 0);
+        };
+
+        recordBtn.addEventListener('pointerup', onPointerRelease);
+        recordBtn.addEventListener('pointercancel', onPointerRelease);
+        recordBtn.addEventListener('pointerleave', (e) => {
+            if(holdStartedRecording && isRecording) onPointerRelease(e);
+        });
+
+        recordBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            // Ignore le click synthetique juste apres un long appui
+            if(suppressNextClick) {
+                suppressNextClick = false;
+                return;
+            }
+
+            // Si l'appui est long, c'est deja traite par pointerup
+            if(Date.now() - pointerDownAt >= HOLD_TO_RECORD_DELAY && !isRecording) {
+                return;
+            }
+
+            if(!isRecording) startRecord(e);
+            else stopRecord(e);
+        });
 
         // --- CUSTOM AUDIO PLAYER ---
         window.audioPlaying = null;
@@ -825,10 +851,10 @@
             }
             
             if(audio.paused) {
+                initAudioPlayer(player);
                 audio.play();
                 btn.innerHTML = '<i class="fas fa-pause"></i>';
                 window.audioPlaying = audioId;
-                updateAudioTime(audioId);
             } else {
                 audio.pause();
                 btn.innerHTML = '<i class="fas fa-play"></i>';
@@ -847,43 +873,40 @@
             audio.currentTime = percent * audio.duration;
         };
         
-        const updateAudioTime = (audioId) => {
-            const audio = document.getElementById(audioId);
+        const updateAudioUI = (audio, player) => {
+            const fill = player.querySelector('.audio-progress-fill');
+            const current = player.querySelector('.audio-time .current');
+            const duration = player.querySelector('.audio-time .duration');
+            const btn = player.querySelector('.audio-play-btn');
+
+            const safeDuration = Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : 0;
+            const safeCurrent = Number.isFinite(audio.currentTime) ? audio.currentTime : 0;
+            const ratio = safeDuration > 0 ? Math.min(100, (safeCurrent / safeDuration) * 100) : 0;
+
+            if(fill) fill.style.width = `${ratio}%`;
+            if(current) current.innerText = formatTime(safeCurrent);
+            if(duration) duration.innerText = formatTime(safeDuration);
+
+            if(audio.ended && btn) btn.innerHTML = '<i class="fas fa-play"></i>';
+            if(audio.ended) window.audioPlaying = null;
+        };
+
+        const initAudioPlayer = (player) => {
+            if(!player || initializedAudioPlayers.has(player)) return;
+            const audio = player.querySelector('audio');
             if(!audio) return;
-            
-            const player = audio.closest('.audio-player');
-            if(!player) return;
-            
-            const updateUI = () => {
-                const fill = player.querySelector('.audio-progress-fill');
-                const current = player.querySelector('.audio-time .current');
-                const duration = player.querySelector('.audio-time .duration');
-                const btn = player.querySelector('.audio-play-btn');
-                
-                if(fill) fill.style.width = (audio.currentTime / audio.duration * 100) + '%';
-                if(current) current.innerText = formatTime(audio.currentTime);
-                if(duration) duration.innerText = formatTime(audio.duration);
-                
-                if(!audio.paused) {
-                    requestAnimationFrame(updateUI);
-                } else if(audio.ended) {
-                    if(btn) btn.innerHTML = '<i class="fas fa-play"></i>';
-                    window.audioPlaying = null;
-                }
-            };
-            
-            audio.addEventListener('loadedmetadata', () => {
-                const duration = player.querySelector('.audio-time .duration');
-                if(duration) duration.innerText = formatTime(audio.duration);
-            });
-            
-            audio.addEventListener('play', updateUI);
-            audio.addEventListener('timeupdate', updateUI);
-            audio.addEventListener('ended', () => {
-                const btn = player.querySelector('.audio-play-btn');
-                if(btn) btn.innerHTML = '<i class="fas fa-play"></i>';
-                window.audioPlaying = null;
-            });
+
+            initializedAudioPlayers.add(player);
+
+            const onAnyUpdate = () => updateAudioUI(audio, player);
+            audio.addEventListener('loadedmetadata', onAnyUpdate);
+            audio.addEventListener('timeupdate', onAnyUpdate);
+            audio.addEventListener('play', onAnyUpdate);
+            audio.addEventListener('pause', onAnyUpdate);
+            audio.addEventListener('ended', onAnyUpdate);
+            audio.addEventListener('error', onAnyUpdate);
+
+            onAnyUpdate();
         };
         
         const formatTime = (seconds) => {
@@ -896,8 +919,7 @@
         // Initialiser les lecteurs audio après rendu
         const initAudioPlayers = () => {
             document.querySelectorAll('.audio-player').forEach(player => {
-                const audioId = player.getAttribute('data-audio-id');
-                if(audioId) updateAudioTime(audioId);
+                initAudioPlayer(player);
             });
         };
         
@@ -908,7 +930,11 @@
             observer.observe(messagesList, { childList: true, subtree: true });
         }
 
-        // GIFS - Tenor dynamique + fallback varié
+        // GIFS - Tenor dynamique + fallback varie
+        let lastGifPos = '';
+        let lastGifTerm = 'trending';
+        const sentGifUrls = new Set();
+
         document.getElementById('toggle-gif').onclick = () => {
             const p = document.getElementById('gif-panel'); p.style.display = p.style.display === 'flex' ? 'none' : 'flex';
             if (p.style.display === 'flex') searchGifs('trending');
@@ -930,27 +956,57 @@
                 
                 const apiKey = "LIVDSRZULELA";
                 const clientKey = "portfolio_chat";
-                const url = term === 'trending' 
-                    ? `https://tenor.googleapis.com/v2/featured?key=${apiKey}&client_key=${clientKey}&limit=18&media_filter=tinygif`
-                    : `https://tenor.googleapis.com/v2/search?q=${encodeURIComponent(term)}&key=${apiKey}&client_key=${clientKey}&limit=18&media_filter=tinygif&random=true`;
+                const normalizedTerm = (term || 'trending').trim().toLowerCase();
+                const sameSearch = normalizedTerm === lastGifTerm;
+                const randSeed = Math.floor(Math.random() * 100000);
+                const posParam = sameSearch && lastGifPos ? `&pos=${encodeURIComponent(lastGifPos)}` : '';
+
+                const url = normalizedTerm === 'trending'
+                    ? `https://tenor.googleapis.com/v2/featured?key=${apiKey}&client_key=${clientKey}&limit=30&media_filter=tinygif&ar_range=all&random=true${posParam}&_=${randSeed}`
+                    : `https://tenor.googleapis.com/v2/search?q=${encodeURIComponent(normalizedTerm)}&key=${apiKey}&client_key=${clientKey}&limit=30&media_filter=tinygif&ar_range=all&random=true${posParam}&_=${randSeed}`;
                 
                 const resp = await fetch(url);
                 if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
                 const data = await resp.json();
+
+                lastGifTerm = normalizedTerm;
+                lastGifPos = data.next || '';
                 
                 resDiv.innerHTML = '';
                 
                 const results = shuffleArray(data.results || []);
+                const selectedUrls = [];
 
                 if(results.length > 0) {
-                    results.slice(0, 12).forEach(g => {
+                    results.forEach(g => {
+                        if(selectedUrls.length >= 12) return;
                         const tiny = g?.media_formats?.tinygif?.url;
                         const full = g?.media_formats?.gif?.url || tiny;
                         if(!tiny || !full) return;
 
+                        if(sentGifUrls.has(full) && results.length > 12) return;
+                        selectedUrls.push({ tiny, full });
+                    });
+
+                    // Si tout est deja vu, on repart quand meme avec un melange local
+                    if(!selectedUrls.length) {
+                        results.slice(0, 12).forEach(g => {
+                            const tiny = g?.media_formats?.tinygif?.url;
+                            const full = g?.media_formats?.gif?.url || tiny;
+                            if(tiny && full) selectedUrls.push({ tiny, full });
+                        });
+                    }
+
+                    selectedUrls.slice(0, 12).forEach(({ tiny, full }) => {
+
                         const img = document.createElement('img');
                         img.src = tiny;
                         img.onclick = () => { 
+                            sentGifUrls.add(full);
+                            if(sentGifUrls.size > 200) {
+                                const oldest = sentGifUrls.values().next().value;
+                                sentGifUrls.delete(oldest);
+                            }
                             sendFinal(full); 
                             document.getElementById('gif-panel').style.display = 'none'; 
                         };
