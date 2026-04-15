@@ -39,9 +39,9 @@
         .avatar-img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; background: #ddd; border: 1px solid #eee; flex-shrink: 0; }
         .avatar-emoji { width: 50px; height: 50px; border-radius: 50%; background: #eee; display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; border: 1px solid #ddd; }
         .user-info { flex: 1; overflow: hidden; }
-        .user-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; }
-        .user-name { font-size: 1.05rem; font-weight: bold; }
-        .user-time { font-size: 0.8rem; color: #888; }
+        .user-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; gap: 8px; }
+        .user-name { font-size: 1.05rem; font-weight: bold; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .user-time { font-size: 0.8rem; color: #888; flex-shrink: 0; }
         .user-preview { font-size: 0.9rem; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         .chat-time-divider {
@@ -87,20 +87,10 @@
         .header-info { display: flex; flex-direction: column; align-items: center; text-align: center; overflow: hidden; }
         .header-name { font-weight: bold; font-size: 1.05rem; color: var(--text-dark); white-space: nowrap; }
         .typing-box { min-height: 0; }
-        .typing-inline {
-            display: none;
-            align-items: flex-end;
-            gap: 8px;
-            padding: 0 15px 8px;
-            background: white;
-        }
-        .typing-inline-avatar {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: #e6e6e6;
-            flex-shrink: 0;
-        }
+        .typing-inline { display: none; }
+        .typing-indicator-group { margin-top: 10px; }
+        .typing-indicator-group .msg-content { max-width: 75%; }
+        .typing-indicator-spacer { width: 28px; height: 28px; flex-shrink: 0; }
         .typing-bubble {
             display: inline-flex;
             align-items: center;
@@ -294,15 +284,6 @@
         
         <div class="messages-list" id="messages-list"></div>
 
-        <div id="typing-inline" class="typing-inline" aria-live="polite">
-            <div class="typing-inline-avatar"></div>
-            <div class="typing-bubble">
-                <span class="typing-dot"></span>
-                <span class="typing-dot"></span>
-                <span class="typing-dot"></span>
-            </div>
-        </div>
-
         <div id="reply-banner">
             <span id="reply-text"></span>
             <button id="cancel-reply-btn" style="background:none; border:none; color:#888; cursor:pointer; font-size:1.2rem;"><i class="fas fa-times-circle"></i></button>
@@ -334,6 +315,7 @@
         let currentUser = ""; let currentTarget = ""; let messagesUnsub = null; let unreadUnsub = null;
         let usersData = {}; const DEFAULT_PFP = "Default_pfp.jpg"; 
         let replyingTo = null;
+        let remoteTyping = false;
 
         const isAudioMessage = (text) => typeof text === 'string' && (/^\[AUDIO\]/i.test(text) || /^data:audio/i.test(text));
         const getAudioPayload = (text) => (text || '').replace(/^\[AUDIO\]/i, '');
@@ -344,12 +326,18 @@
             if (!ts) return 0;
             if (typeof ts.toDate === 'function') return ts.toDate().getTime();
             if (typeof ts.seconds === 'number') return ts.seconds * 1000;
+            if (ts instanceof Date) return ts.getTime();
+            if (typeof ts === 'number') return ts;
+            if (typeof ts === 'string') {
+                const parsed = Date.parse(ts);
+                return Number.isNaN(parsed) ? 0 : parsed;
+            }
             return 0;
         };
 
         const formatRelativeTime = (timestampMs) => {
-            if (!timestampMs) return '';
-            const diff = Date.now() - timestampMs;
+            if (!timestampMs) return 'à l\'instant';
+            const diff = Math.max(0, Date.now() - timestampMs);
             const min = Math.floor(diff / 60000);
             if (min < 1) return 'à l\'instant';
             if (min < 60) return `il y a ${min} min`;
@@ -380,15 +368,43 @@
         }
 
         function setTypingIndicator(isTyping) {
-            const typingInline = document.getElementById('typing-inline');
-            if(!typingInline) return;
+            const list = document.getElementById('messages-list');
+            if(!list) return;
+
+            const existing = document.getElementById('typing-indicator-message');
             if(!isTyping) {
-                typingInline.style.display = 'none';
+                if (existing) existing.remove();
                 scrollMessagesToBottom();
                 return;
             }
 
-            typingInline.style.display = 'flex';
+            if (existing) {
+                scrollMessagesToBottom();
+                return;
+            }
+
+            const group = document.createElement('div');
+            group.id = 'typing-indicator-message';
+            group.className = 'msg-group other typing-indicator-group';
+
+            const spacer = document.createElement('div');
+            spacer.className = 'typing-indicator-spacer';
+
+            const content = document.createElement('div');
+            content.className = 'msg-content';
+
+            const bubble = document.createElement('div');
+            bubble.className = 'typing-bubble';
+            bubble.innerHTML = `
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+            `;
+
+            content.appendChild(bubble);
+            group.appendChild(spacer);
+            group.appendChild(content);
+            list.appendChild(group);
             scrollMessagesToBottom();
         }
 
@@ -484,7 +500,7 @@
                         const unread = allMsgs.some(m => m.chatId === chatId && m.user !== currentUser && !m.read);
                         users.push({ ...u.data(), lastMsg, unread });
                     });
-                    users.sort((a, b) => (b.lastMsg?.timestamp?.seconds || 0) - (a.lastMsg?.timestamp?.seconds || 0));
+                    users.sort((a, b) => getTimestampMs(b.lastMsg?.timestamp) - getTimestampMs(a.lastMsg?.timestamp));
                     renderUserItem({ username: "Salon Global", lastMsg: allMsgs.find(m => m.chatId === "Global") }, true);
                     users.forEach(u => renderUserItem(u));
                 });
@@ -504,7 +520,8 @@
                 else preview = data.lastMsg.text;
 
                 if (data.lastMsg.user === currentUser) preview = `Vous : ${preview}`;
-                timeText = formatRelativeTime(getTimestampMs(data.lastMsg.timestamp));
+                const tsMs = getTimestampMs(data.lastMsg.timestamp);
+                timeText = formatRelativeTime(tsMs);
             }
 
             const pfpHTML = isGlobal 
@@ -611,12 +628,8 @@
                             currentGroupWrapper.className = `msg-group ${isMine ? 'mine' : 'other'}`;
                             
                             if (!isMine) {
-                                if (target === "Global") {
-                                    currentGroupWrapper.innerHTML = `<div class="message-avatar emoji">🌍</div>`;
-                                } else {
-                                    const pfp = usersData[m.user]?.pfp || DEFAULT_PFP;
-                                    currentGroupWrapper.innerHTML = `<img src="${pfp}" class="message-avatar" onerror="this.src='https://i.imgur.com/7I10o4M.jpeg'">`;
-                                }
+                                const pfp = usersData[m.user]?.pfp || DEFAULT_PFP;
+                                currentGroupWrapper.innerHTML = `<img src="${pfp}" class="message-avatar" onerror="this.src='https://i.imgur.com/7I10o4M.jpeg'">`;
                             } else {
                                 currentGroupWrapper.innerHTML = `<div style="width:28px; height:28px; flex-shrink:0;"></div>`;
                             }
@@ -683,14 +696,17 @@
                     lastMineContentDiv.appendChild(readDiv);
                 }
 
+                setTypingIndicator(remoteTyping);
                 scrollMessagesToBottom();
             });
 
             if (target !== "Global") {
                 onSnapshot(doc(db, "users", target), (d) => {
-                    setTypingIndicator(d.exists() && d.data().isTyping);
+                    remoteTyping = !!(d.exists() && d.data().isTyping);
+                    setTypingIndicator(remoteTyping);
                 });
             } else {
+                remoteTyping = false;
                 setTypingIndicator(false);
             }
         }
