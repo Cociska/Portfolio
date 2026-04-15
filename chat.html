@@ -60,10 +60,15 @@
         .profile-field label { font-size: 0.85rem; font-weight: bold; color: #666; margin-bottom: 5px; display: block; }
         .profile-field input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; outline: none; font-size: 16px !important; }
 
-        /* Chat Interface Header (Parfaitement centré) */
-        .chat-interface-header { background: #f0ede9; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
-        .side-action { width: 45px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .header-info { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; overflow: hidden; }
+        /* --- Chat Interface Header (Parfaitement centré avec Grid) --- */
+        .chat-interface-header { 
+            display: grid; grid-template-columns: 50px 1fr 50px; align-items: center; 
+            background: #f0ede9; padding: 10px 15px; border-bottom: 1px solid #ddd; 
+        }
+        .side-action { display: flex; align-items: center; }
+        .side-action.left { justify-content: flex-start; }
+        .side-action.right { justify-content: flex-end; }
+        .header-info { display: flex; flex-direction: column; align-items: center; text-align: center; overflow: hidden; }
         .header-name { font-weight: bold; font-size: 1.05rem; color: var(--text-dark); white-space: nowrap; }
         .typing-box { font-size: 0.75rem; color: var(--accent-color); font-style: italic; min-height: 15px; }
 
@@ -73,37 +78,44 @@
         .msg-group { display: flex; width: 100%; margin-top: 10px; align-items: flex-end; gap: 8px; }
         .msg-group.mine { flex-direction: row-reverse; }
         
-        .msg-content { display: flex; flex-direction: column; max-width: 75%; gap: 2px; }
+        .msg-content { display: flex; flex-direction: column; max-width: 75%; }
         .msg-group.mine .msg-content { align-items: flex-end; }
         .msg-group.other .msg-content { align-items: flex-start; }
         
         .sender-name { font-size: 0.75rem; color: #888; margin-bottom: 2px; margin-left: 2px; margin-right: 2px; }
         .message-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
-        .message-avatar.emoji { display: flex; align-items: center; justify-content: center; background: #eee; font-size: 16px; border: 1px solid #ddd; }
+        .message-avatar.emoji { display: flex; align-items: center; justify-content: center; background: transparent; font-size: 22px; border: none; }
         
-        .message { padding: 10px 14px; border-radius: 18px; font-size: 0.95rem; word-wrap: break-word; line-height: 1.4; position: relative; transition: transform 0.2s; }
-        .message.mine { background: var(--accent-color); color: white; border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
-        .message.other { background: #f0f0f0; color: black; border-top-left-radius: 4px; border-bottom-left-radius: 4px; }
+        /* Conteneur individuel pour le Hover du bouton répondre */
+        .msg-container { display: flex; align-items: center; position: relative; margin-bottom: 2px; width: fit-content; }
+        .msg-group.mine .msg-container { flex-direction: row-reverse; }
+
+        .message { padding: 10px 14px; border-radius: 18px; font-size: 0.95rem; word-wrap: break-word; line-height: 1.4; transition: transform 0.2s; }
+        .message.mine { background: var(--accent-color); color: white; }
+        .message.other { background: #f0f0f0; color: black; }
         
-        /* Arrondis pour le premier et dernier message du groupe */
-        .message:first-child { border-top-left-radius: 18px; border-top-right-radius: 18px; }
-        .message:last-child { border-bottom-left-radius: 18px; border-bottom-right-radius: 18px; }
-        .message.mine:last-child { border-bottom-right-radius: 4px; }
-        .message.other:last-child { border-bottom-left-radius: 4px; }
+        /* Arrondis dynamiques pour l'effet compact */
+        .msg-group.mine .msg-container .message { border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
+        .msg-group.mine .msg-container:first-child .message { border-top-right-radius: 18px; }
+        .msg-group.mine .msg-container:last-child .message { border-bottom-right-radius: 18px; }
+
+        .msg-group.other .msg-container .message { border-top-left-radius: 4px; border-bottom-left-radius: 4px; }
+        .msg-group.other .msg-container:first-child .message { border-top-left-radius: 18px; }
+        .msg-group.other .msg-container:last-child .message { border-bottom-left-radius: 18px; }
 
         .message img { max-width: 100%; border-radius: 10px; display: block; margin-top: 5px; }
         
         /* Audio Vocaux */
-        .message audio { height: 35px; width: 220px; outline: none; border-radius: 20px; max-width: 100%; }
-        .message.mine audio { filter: invert(1); } /* Pour fondre dans le marron */
+        .message audio { height: 40px; width: 220px; outline: none; max-width: 100%; border-radius: 20px; }
+        .message.mine audio { filter: invert(1); }
 
         /* Réponse (Reply) UI */
         .reply-quote { background: rgba(0,0,0,0.1); padding: 6px 10px; border-radius: 6px; border-left: 3px solid rgba(0,0,0,0.3); font-size: 0.8rem; margin-bottom: 6px; display: block; opacity: 0.9; }
         .message.mine .reply-quote { background: rgba(255,255,255,0.2); border-left-color: white; }
-        .reply-btn-hover { position: absolute; top: 50%; transform: translateY(-50%); background: #ddd; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: none; align-items: center; justify-content: center; font-size: 0.8rem; color: #555; }
-        .msg-group.mine .reply-btn-hover { left: -35px; }
-        .msg-group.other .reply-btn-hover { right: -35px; }
-        .message:hover .reply-btn-hover { display: flex; }
+        
+        /* Bouton répondre qui apparait au Hover du msg-container */
+        .reply-btn-hover { opacity: 0; pointer-events: none; margin: 0 10px; width: 30px; height: 30px; border-radius: 50%; background: #ddd; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #555; transition: 0.2s; }
+        .msg-container:hover .reply-btn-hover { opacity: 1; pointer-events: auto; }
 
         #reply-banner { display: none; background: #eee; padding: 8px 15px; border-left: 4px solid var(--accent-color); font-size: 0.85rem; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
         #reply-banner span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; margin-right: 10px; color: #555; }
@@ -153,9 +165,9 @@
 
     <div class="app-view" id="profile-view">
         <div class="chat-interface-header">
-            <div class="side-action"><button id="close-profile-btn" class="header-btn" style="color:var(--text-dark);"><i class="fas fa-chevron-left"></i></button></div>
+            <div class="side-action left"><button id="close-profile-btn" class="header-btn" style="color:var(--text-dark);"><i class="fas fa-chevron-left"></i></button></div>
             <div class="header-info"><span class="header-name">Mon Profil</span></div>
-            <div class="side-action"></div>
+            <div class="side-action right"></div>
         </div>
         <div class="profile-container">
             <div class="profile-pfp-wrapper" id="pfp-clicker">
@@ -180,13 +192,12 @@
 
     <div class="app-view" id="chat-interface">
         <div class="chat-interface-header">
-            <div class="side-action"><button id="back-btn" class="header-btn" style="color:var(--text-dark);"><i class="fas fa-chevron-left"></i></button></div>
+            <div class="side-action left"><button id="back-btn" class="header-btn" style="color:var(--text-dark);"><i class="fas fa-chevron-left"></i></button></div>
             <div class="header-info">
                 <span id="target-name" class="header-name"></span>
                 <span id="typing-box" class="typing-box"></span>
             </div>
-            <div class="side-action" id="header-pfp-container">
-                </div>
+            <div class="side-action right" id="header-pfp-container"></div>
         </div>
         
         <div class="messages-list" id="messages-list"></div>
@@ -197,7 +208,7 @@
         </div>
 
         <div id="gif-panel">
-            <input type="text" id="gif-search" placeholder="Rechercher via Tenor..." style="padding:8px; border-radius:15px; border:1px solid #ddd; outline:none;">
+            <input type="text" id="gif-search" placeholder="Rechercher via Giphy..." style="padding:8px; border-radius:15px; border:1px solid #ddd; outline:none;">
             <div id="gif-results"></div>
         </div>
 
@@ -323,7 +334,7 @@
                         users.push({ ...u.data(), lastMsg, unread });
                     });
                     users.sort((a, b) => (b.lastMsg?.timestamp?.seconds || 0) - (a.lastMsg?.timestamp?.seconds || 0));
-                    renderUserItem({ username: "Global", lastMsg: allMsgs.find(m => m.chatId === "Global") }, true);
+                    renderUserItem({ username: "Salon Global", lastMsg: allMsgs.find(m => m.chatId === "Global") }, true);
                     users.forEach(u => renderUserItem(u));
                 });
             });
@@ -333,11 +344,11 @@
             const item = document.createElement('div');
             item.className = `user-item ${data.unread ? 'unread' : ''}`;
             
-            // L'aperçu ne montre plus la bio, juste "Appuyer pour discuter" s'il n'y a pas de message
+            // Retrait de la bio pour un aperçu plus propre
             let preview = "Appuyer pour discuter";
             if (data.lastMsg) {
-                if (data.lastMsg.text.startsWith('[AUDIO]')) preview = "🎙️ Message vocal";
-                else if (data.lastMsg.text.includes('http')) preview = "GIF";
+                if (data.lastMsg.text.startsWith('[AUDIO]') || data.lastMsg.text.startsWith('data:audio')) preview = "🎙️ Message vocal";
+                else if (data.lastMsg.text.includes('giphy.com')) preview = "GIF";
                 else preview = data.lastMsg.text;
             }
 
@@ -348,17 +359,21 @@
             item.innerHTML = `
                 ${pfpHTML}
                 <div class="user-info">
-                    <div class="user-top"><span class="user-name">${isGlobal ? "Salon Global" : data.username}</span></div>
+                    <div class="user-top"><span class="user-name">${data.username}</span></div>
                     <div class="user-preview">${preview}</div>
                 </div>
             `;
-            item.onclick = () => openChat(data.username);
+            item.onclick = () => openChat(isGlobal ? "Global" : data.username);
             document.getElementById('user-list-container').appendChild(item);
         }
 
         // SWIPE REPLY
         function setReplyTo(user, text) {
-            replyingTo = { user, text: text.startsWith('[AUDIO]') ? 'Message vocal' : text };
+            let replyPreview = text;
+            if(text.startsWith('[AUDIO]') || text.startsWith('data:audio')) replyPreview = 'Message vocal';
+            else if (text.includes('giphy.com')) replyPreview = 'GIF';
+            
+            replyingTo = { user, text: replyPreview };
             document.getElementById('reply-banner').style.display = 'flex';
             document.getElementById('reply-text').innerText = `Réponse à ${user} : ${replyingTo.text}`;
             document.getElementById('msg-input').focus();
@@ -384,15 +399,13 @@
             document.getElementById('target-name').innerText = target === "Global" ? "Salon Global" : target;
             document.getElementById('cancel-reply-btn').click();
             
-            // Gestion de la photo de profil dans le Header
+            // Gestion Header (Terre ou PFP)
             const headerPfpContainer = document.getElementById('header-pfp-container');
             if (target === "Global") {
-                headerPfpContainer.innerHTML = `<div class="message-avatar emoji" style="width:35px; height:35px; font-size:18px;">🌍</div>`;
+                headerPfpContainer.innerHTML = `<div class="avatar-emoji" style="width:35px; height:35px; font-size:18px;">🌍</div>`;
             } else {
                 const pfpUrl = usersData[target]?.pfp || DEFAULT_PFP;
                 headerPfpContainer.innerHTML = `<img src="${pfpUrl}" class="avatar-img" style="width:35px; height:35px; cursor:pointer;" onerror="this.src='https://i.imgur.com/7I10o4M.jpeg'">`;
-                
-                // Action pour ouvrir la Modal Profil (Uniquement en MP)
                 headerPfpContainer.querySelector('img').onclick = () => {
                     document.getElementById('modal-pfp').src = pfpUrl;
                     document.getElementById('modal-name').innerText = target;
@@ -422,12 +435,10 @@
                     if(m.chatId === chatId) {
                         const isMine = m.user === currentUser;
 
-                        // Si c'est un nouveau groupe (nouvel utilisateur qui parle)
                         if (m.user !== lastUser) {
                             currentGroupWrapper = document.createElement('div');
                             currentGroupWrapper.className = `msg-group ${isMine ? 'mine' : 'other'}`;
                             
-                            // Affichage Avatar
                             if (!isMine) {
                                 if (target === "Global") {
                                     currentGroupWrapper.innerHTML = `<div class="message-avatar emoji">🌍</div>`;
@@ -441,37 +452,47 @@
 
                             currentContentDiv = document.createElement('div'); 
                             currentContentDiv.className = 'msg-content';
-                            
                             if(!isMine && target === "Global") currentContentDiv.innerHTML += `<div class="sender-name">${m.user}</div>`;
                             
                             currentGroupWrapper.appendChild(currentContentDiv);
                             list.appendChild(currentGroupWrapper);
                         }
 
-                        // Création de la bulle individuelle
+                        // Conteneur individuel pour gérer le hover du bouton "Répondre" sans bug
+                        const msgContainer = document.createElement('div');
+                        msgContainer.className = 'msg-container';
+
                         const msgDiv = document.createElement('div'); 
                         msgDiv.className = `message ${isMine ? 'mine' : 'other'}`;
                         addSwipeListener(msgDiv, m.user, m.text);
                         
-                        const replyBtn = document.createElement('button'); replyBtn.className = 'reply-btn-hover'; replyBtn.innerHTML = '<i class="fas fa-reply"></i>';
-                        replyBtn.onclick = () => setReplyTo(m.user, m.text); msgDiv.appendChild(replyBtn);
+                        const replyBtn = document.createElement('button'); 
+                        replyBtn.className = 'reply-btn-hover'; 
+                        replyBtn.innerHTML = '<i class="fas fa-reply"></i>';
+                        replyBtn.onclick = () => setReplyTo(m.user, m.text); 
 
                         let innerHTML = '';
                         if(m.replyTo) innerHTML += `<div class="reply-quote"><b>${m.replyTo.user}</b><br>${m.replyTo.text}</div>`;
                         
-                        // Traitement du contenu (GIF, Audio ou Texte)
-                        if (m.text.includes('tenor.com') || m.text.includes('giphy.com')) {
-                            innerHTML += `<img src="${m.text}" alt="GIF">`;
-                        } else if (m.text.startsWith('[AUDIO]')) {
+                        // Reconnaissance Audio ET anciens bugs audios
+                        if (m.text.startsWith('[AUDIO]') || m.text.startsWith('data:audio')) {
                             const audioSrc = m.text.replace('[AUDIO]', '');
                             innerHTML += `<audio controls src="${audioSrc}"></audio>`;
+                            msgDiv.style.background = 'transparent'; msgDiv.style.padding = '0'; msgDiv.style.boxShadow = 'none';
+                        } 
+                        else if (m.text.includes('giphy.com')) {
+                            innerHTML += `<img src="${m.text}" alt="GIF">`;
                             msgDiv.style.background = 'transparent'; msgDiv.style.padding = '0';
                         } else {
                             innerHTML += m.text;
                         }
                         
                         msgDiv.innerHTML += innerHTML; 
-                        currentContentDiv.appendChild(msgDiv); 
+                        
+                        msgContainer.appendChild(msgDiv);
+                        msgContainer.appendChild(replyBtn);
+                        currentContentDiv.appendChild(msgContainer); 
+                        
                         lastUser = m.user;
                     }
                 });
@@ -482,7 +503,7 @@
             else document.getElementById('typing-box').innerText = "";
         }
 
-        // ENVOI & VOCAUX (Style Insta)
+        // ENVOI & VOCAUX
         const msgInput = document.getElementById('msg-input');
         const sendTextBtn = document.getElementById('send-text-btn');
         const recordBtn = document.getElementById('record-btn');
@@ -506,14 +527,13 @@
         sendTextBtn.onclick = () => { const t = msgInput.value.trim(); if(t) { sendFinal(t); msgInput.value = ""; msgInput.oninput(); } };
         msgInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendTextBtn.click(); });
 
-        // LOGIQUE MESSAGES VOCAUX
+        // LOGIQUE MESSAGES VOCAUX 
         let mediaRecorder; let audioChunks = []; let isRecording = false;
         
         const startRecord = async (e) => {
             e.preventDefault();
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                // Utilise le format natif sans forcer le webm pour que ça marche sur Safari iOS
                 mediaRecorder = new MediaRecorder(stream); 
                 audioChunks = [];
                 mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
@@ -521,10 +541,7 @@
                     const audioBlob = new Blob(audioChunks); 
                     const reader = new FileReader();
                     reader.readAsDataURL(audioBlob);
-                    reader.onloadend = () => {
-                        // Ajout du tag [AUDIO] pour bien l'identifier à la lecture
-                        sendFinal("[AUDIO]" + reader.result);
-                    };
+                    reader.onloadend = () => sendFinal("[AUDIO]" + reader.result);
                 };
                 mediaRecorder.start(); isRecording = true;
                 recordBtn.classList.add('recording');
@@ -545,7 +562,7 @@
         recordBtn.addEventListener('touchstart', startRecord);
         recordBtn.addEventListener('touchend', stopRecord);
 
-        // GIFS (API Tenor fiable)
+        // GIFS GIPHY OFFICIEL
         document.getElementById('toggle-gif').onclick = () => {
             const p = document.getElementById('gif-panel'); p.style.display = p.style.display === 'flex' ? 'none' : 'flex';
             if (p.style.display === 'flex') searchGifs('trending');
@@ -553,15 +570,21 @@
 
         async function searchGifs(term) {
             try {
-                const url = term === 'trending' ? `https://g.tenor.com/v1/trending?key=LIVDSRZULECB&limit=12` : `https://g.tenor.com/v1/search?key=LIVDSRZULECB&q=${term}&limit=12`;
+                const apiKey = "dc6zaTOxFJmzC"; // Clé Beta Publique
+                const url = term === 'trending' ? `https://api.giphy.com/v1/gifs/trending?api_key=${apiKey}&limit=12` : `https://api.giphy.com/v1/gifs/search?api_key=${apiKey}&q=${term}&limit=12`;
                 const resp = await fetch(url); const data = await resp.json();
                 const resDiv = document.getElementById('gif-results'); resDiv.innerHTML = '';
-                if(data.results) { data.results.forEach(g => {
-                    const img = document.createElement('img'); img.src = g.media[0].tinygif.url;
-                    img.onclick = () => { sendFinal(g.media[0].gif.url); document.getElementById('gif-panel').style.display = 'none'; };
-                    resDiv.appendChild(img);
-                });}
-            } catch(e) { console.error("Erreur réseau pour les GIFs", e); }
+                if(data.data && data.data.length > 0) { 
+                    data.data.forEach(g => {
+                        const img = document.createElement('img'); img.src = g.images.fixed_height_small.url;
+                        img.onclick = () => { sendFinal(g.images.fixed_height.url); document.getElementById('gif-panel').style.display = 'none'; };
+                        resDiv.appendChild(img);
+                    });
+                } else { resDiv.innerHTML = '<p style="text-align:center; grid-column:span 3;">Aucun GIF trouvé.</p>'; }
+            } catch(e) { 
+                console.error("Giphy API Error:", e);
+                document.getElementById('gif-results').innerHTML = '<p style="text-align:center; grid-column:span 3; color:red;">Erreur de connexion à Giphy.</p>';
+            }
         }
         document.getElementById('gif-search').oninput = (e) => searchGifs(e.target.value || 'trending');
 
