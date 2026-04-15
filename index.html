@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adam Kattouf | Portfolio</title>
+    <title>Adam Kattouf | Portfolio Chat Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* [Ton CSS existant intact] */
         :root {
             --bg-color: #E8E6E1;
             --accent-color: #8B5E3C;
@@ -15,284 +14,112 @@
             --card-bg: #FFFFFF;
         }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-dark);
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            line-height: 1.6;
-        }
+        body { background-color: var(--bg-color); color: var(--text-dark); font-family: 'Roboto', sans-serif; margin: 0; }
 
-        header {
-            height: 60vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 20px;
-        }
-
-        h1 {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 3rem;
-            text-transform: uppercase;
-            margin-bottom: 10px;
-            letter-spacing: -1px;
-        }
-
-        .badge {
-            background-color: var(--accent-color);
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            margin-bottom: 20px;
-        }
-
-        .intro {
-            max-width: 600px;
-            font-size: 1.1rem;
-            color: #555;
-        }
-
-        .cta-container {
-            margin-top: 30px;
-        }
-
-        .btn {
-            text-decoration: none;
-            padding: 12px 25px;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: 0.3s;
-            display: inline-block;
-            margin: 5px;
-            cursor: pointer;
-            border: none;
-            font-family: 'Roboto', sans-serif;
-            font-size: 1rem;
-        }
-
+        header { height: 60vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
+        .btn { text-decoration: none; padding: 12px 25px; border-radius: 5px; font-weight: bold; transition: 0.3s; display: inline-block; margin: 5px; cursor: pointer; border: none; }
         .btn-primary { background: var(--text-dark); color: white; }
-        .btn-primary:hover { background: var(--accent-color); }
         .btn-secondary { background: transparent; border: 2px solid var(--text-dark); color: var(--text-dark); }
-        .btn-secondary:hover { background: var(--text-dark); color: white; }
-
-        section {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 50px 20px;
-        }
-
-        h2 {
-            font-family: 'Montserrat', sans-serif;
-            text-transform: uppercase;
-            border-bottom: 3px solid var(--accent-color);
-            display: inline-block;
-            margin-bottom: 30px;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .card {
-            background: var(--card-bg);
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            transition: transform 0.3s;
-        }
-
-        .card:hover { transform: translateY(-5px); }
-        .card i { font-size: 2rem; color: var(--accent-color); margin-bottom: 15px; }
-        .card h3 { margin-top: 0; font-family: 'Montserrat', sans-serif; }
-
-        .tags { margin-top: 15px; }
-        .tag {
-            font-size: 0.75rem;
-            background: #eee;
-            padding: 3px 8px;
-            border-radius: 4px;
-            margin-right: 5px;
-            font-weight: bold;
-        }
-
-        footer {
-            text-align: center;
-            padding: 40px;
-            font-size: 0.9rem;
-            color: #777;
-        }
-
-        @media (max-width: 600px) {
-            h1 { font-size: 2rem; }
-        }
 
         /* =========================================
-           CSS MESSAGERIE V3 (Sécurité + Salles)
+           CSS MESSAGERIE V4 (Style Revolut & Pro)
            ========================================= */
         .chat-popup {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 350px;
-            max-width: 90vw;
-            height: 450px;
-            background: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            transform: translateY(150%);
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 1000;
+            position: fixed; bottom: 20px; right: 20px; width: 380px; max-width: 90vw; height: 500px;
+            background: var(--card-bg); border-radius: 15px; box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            display: flex; flex-direction: column; overflow: hidden; transform: translateY(150%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 1000;
         }
-
         .chat-popup.active { transform: translateY(0); }
 
-        .chat-header {
-            background: var(--text-dark);
-            color: white;
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-family: 'Montserrat', sans-serif;
-        }
-
-        .chat-header h3 { margin: 0; font-size: 1.1rem; }
-        .close-chat-btn { background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; transition: color 0.2s; }
-        .close-chat-btn:hover { color: var(--accent-color); }
-
+        .chat-header { background: var(--text-dark); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
         .chat-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #f9f9f9; }
 
-        /* Écran 1: Login */
-        .chat-login { padding: 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; text-align: center; }
-        .chat-login input { padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; width: 80%; font-family: 'Roboto', sans-serif; }
-        .info-text { font-size: 0.8rem; color: #666; margin-bottom: 15px; }
+        /* --- Ecran Login & PIN --- */
+        .chat-login { padding: 30px; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; }
+        .pin-container { display: flex; gap: 15px; margin: 20px 0; }
+        .pin-dot { width: 15px; height: 15px; border: 2px solid #ccc; border-radius: 50%; transition: 0.2s; }
+        .pin-dot.filled { background: var(--accent-color); border-color: var(--accent-color); transform: scale(1.2); }
+        #hidden-pin-input { position: absolute; opacity: 0; pointer-events: none; }
 
-        /* Écran 2: Sélection du destinataire */
-        .chat-selection { padding: 15px; display: none; flex-direction: column; height: 100%; }
-        .chat-selection p { font-weight: bold; margin-top: 0; font-size: 0.95rem; text-align: center; color: var(--text-dark); }
-        .user-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
-        
-        .user-list-btn {
-            background: white; border: 1px solid #ddd; padding: 12px; border-radius: 8px; text-align: left;
-            cursor: pointer; font-family: 'Roboto', sans-serif; font-size: 0.9rem; transition: 0.2s; display: flex; align-items: center; gap: 10px;
+        /* --- Ecran Liste Users --- */
+        .chat-selection { display: none; flex-direction: column; height: 100%; overflow-y: auto; }
+        .user-item {
+            padding: 12px 15px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; flex-direction: column; gap: 4px; transition: 0.2s;
         }
-        .user-list-btn:hover { background: var(--accent-color); color: white; border-color: var(--accent-color); }
-        .user-list-btn i { color: #888; }
-        .user-list-btn:hover i { color: white; }
-        
-        .global-btn { border-color: var(--text-dark); font-weight: bold; }
-        .global-btn i { color: var(--text-dark); }
+        .user-item:hover { background: #f0ede9; }
+        .user-item.unread { font-weight: bold; background: #fff; }
+        .user-top { display: flex; justify-content: space-between; align-items: center; }
+        .user-name { font-size: 0.95rem; }
+        .user-time { font-size: 0.75rem; color: #888; font-weight: normal; }
+        .user-preview { font-size: 0.8rem; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; font-weight: normal; }
 
-        /* Écran 3: Interface Chat */
+        /* --- Ecran Chat --- */
         .chat-messages-container { display: none; flex-direction: column; height: 100%; }
-        
-        .chat-interface-header {
-            background: #E8E6E1; padding: 8px 15px; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; font-weight: bold; border-bottom: 1px solid #ddd;
-        }
-        .back-btn { background: none; border: none; cursor: pointer; color: var(--text-dark); font-weight: bold; font-family: 'Roboto', sans-serif; transition: 0.2s; }
-        .back-btn:hover { color: var(--accent-color); }
+        .messages-list { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 8px; }
+        .message { max-width: 80%; padding: 8px 12px; border-radius: 12px; font-size: 0.9rem; position: relative; }
+        .message.mine { background: var(--accent-color); color: white; align-self: flex-end; }
+        .message.other { background: #eee; align-self: flex-start; }
+        .read-status { font-size: 0.7rem; align-self: flex-end; margin-top: -5px; margin-right: 5px; color: #888; }
+        .typing-indicator { font-size: 0.75rem; color: #888; padding: 5px 15px; font-style: italic; min-height: 20px; }
 
-        .messages-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 15px; }
-        
-        .message { max-width: 80%; padding: 8px 12px; border-radius: 15px; font-size: 0.9rem; position: relative; word-wrap: break-word; }
-        .message.other { background: #E8E6E1; align-self: flex-start; border-bottom-left-radius: 2px; }
-        .message.mine { background: var(--accent-color); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
-        .msg-info { font-size: 0.65rem; opacity: 0.7; margin-bottom: 3px; display: block; }
-
-        .chat-input-area { display: flex; gap: 10px; padding: 10px 15px; background: white; border-top: 1px solid #eee; }
-        .chat-input-area input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 20px; font-family: 'Roboto', sans-serif; outline: none; }
-        .chat-input-area input:focus { border-color: var(--accent-color); }
-        .send-btn { background: var(--accent-color); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .send-btn:hover { background: var(--text-dark); }
+        .chat-input-area { display: flex; gap: 10px; padding: 10px; border-top: 1px solid #eee; background: white; }
+        .chat-input-area input { flex: 1; padding: 10px; border-radius: 20px; border: 1px solid #ddd; outline: none; }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="badge">Disponible pour stage (Juillet 2026)</div>
         <h1>Adam Kattouf</h1>
-        <p class="intro">Étudiant à <strong>Epitech Lille</strong></p>
         <div class="cta-container">
-            <a href="cv.html" class="btn btn-primary"><i class="fas fa-file-pdf"></i> Voir mon CV</a>
-            <a href="https://github.com/Cociska" class="btn btn-secondary"><i class="fab fa-github"></i> GitHub</a>
-            <button id="open-chat-btn" class="btn btn-secondary"><i class="fas fa-comment-dots"></i> Messagerie</button>
+            <button id="open-chat-btn" class="btn btn-primary"><i class="fas fa-comment-dots"></i> Messagerie</button>
         </div>
     </header>
 
-    <section id="projets">
-        <h2>Projets & Labo</h2>
-        <div class="grid">
-            <div class="card">
-                <i class="fas fa-server"></i>
-                <h3>Infrastructure Home-Lab</h3>
-                <p>Gestion de mon propre serveur domestique (cociska.dev). Automatisation avec n8n et déploiement de services via Docker.</p>
-            </div>
-            <div class="card">
-                <i class="fas fa-code"></i>
-                <h3>Projets Epitech (C)</h3>
-                <p>Développement de projets système : My_Radar (simulation de trafic aérien) et implémentation de tables de hachage sécurisées.</p>
-            </div>
-            <div class="card">
-                <i class="fas fa-terminal"></i>
-                <h3>Admin Système & Security</h3>
-                <p>Configuration avancée de Linux (Arch, Fedora), durcissement SSH et scripting Bash pour l'automatisation.</p>
-            </div>
-        </div>
-    </section>
-
-    <footer>
-        <p>2026 Adam Kattouf - Hébergé sur mon infrastructure personnelle</p>
-    </footer>
-
     <div class="chat-popup" id="chat-popup">
         <div class="chat-header">
-            <h3><i class="fas fa-comment-dots"></i> Discutons !</h3>
-            <button class="close-chat-btn" id="close-chat-btn"><i class="fas fa-times"></i></button>
+            <h3 id="header-title">Connexion</h3>
+            <button style="background:none; border:none; color:white; cursor:pointer;" id="close-chat-btn"><i class="fas fa-times"></i></button>
         </div>
         <div class="chat-body">
-            
-            <div class="chat-login" id="chat-login">
-                <p style="margin-bottom: 5px; font-weight: bold;">Identifiez-vous</p>
-                <input type="text" id="username-input" placeholder="Votre pseudo..." autocomplete="off">
-                <input type="password" id="pin-input" placeholder="Code secret (6 chiffres)" maxlength="6" pattern="\d{6}" autocomplete="off">
-                <p class="info-text">Si le pseudo est nouveau, ce code sera enregistré comme votre mot de passe.</p>
-                <button class="btn btn-primary" id="start-chat-btn">Se connecter</button>
+            <div class="chat-login" id="chat-step-user">
+                <p>Choisissez un pseudo</p>
+                <input type="text" id="username-input" placeholder="Pseudo..." style="padding:10px; border-radius:5px; border:1px solid #ccc; width:80%;">
+                <button class="btn btn-primary" id="go-to-pin" style="margin-top:15px;">Suivant</button>
+            </div>
+
+            <div class="chat-login" id="chat-step-pin" style="display:none;">
+                <p>Entrez votre code secret</p>
+                <div class="pin-container">
+                    <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+                    <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+                </div>
+                <input type="password" id="hidden-pin-input" maxlength="6" inputmode="numeric">
+                <p class="info-text" style="font-size:0.7rem;">6 chiffres requis</p>
             </div>
 
             <div class="chat-selection" id="chat-selection">
-                <p>Avec qui voulez-vous discuter ?</p>
-                <div class="user-list" id="user-list"></div>
+                <div id="user-list-container"></div>
             </div>
 
             <div class="chat-messages-container" id="chat-interface">
-                <div class="chat-interface-header">
-                    <span id="chat-target-label">Salon Global</span>
-                    <button class="back-btn" id="back-to-users-btn"><i class="fas fa-arrow-left"></i> Retour</button>
+                <div style="padding:5px 15px; background:#eee; font-size:0.8rem; display:flex; justify-content:space-between;">
+                    <span id="target-name"></span>
+                    <button id="back-btn" style="border:none; background:none; cursor:pointer; font-weight:bold;">Retour</button>
                 </div>
                 <div class="messages-list" id="messages-list"></div>
+                <div id="typing-box" class="typing-indicator"></div>
                 <div class="chat-input-area">
-                    <input type="text" id="msg-input" placeholder="Écrivez un message..." autocomplete="off">
-                    <button class="send-btn" id="send-btn"><i class="fas fa-paper-plane"></i></button>
+                    <input type="text" id="msg-input" placeholder="Message...">
+                    <button id="send-btn" class="btn btn-primary" style="border-radius:50%; width:40px; height:40px; padding:0;"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
-
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc, getDoc, updateDoc, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAuXwoROo6ZCjZWDLq79XKzUD7oS3ws7nM",
@@ -306,170 +133,177 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        const chatPopup = document.getElementById('chat-popup');
-        const chatLogin = document.getElementById('chat-login');
-        const chatSelection = document.getElementById('chat-selection');
-        const chatInterface = document.getElementById('chat-interface');
-        
         let currentUser = "";
         let currentTarget = "";
-        let messagesUnsubscribe = null;
+        let messagesUnsub = null;
+        let typingTimeout;
 
-        // --- NAVIGATION ---
-        document.getElementById('open-chat-btn').addEventListener('click', () => chatPopup.classList.add('active'));
-        document.getElementById('close-chat-btn').addEventListener('click', () => chatPopup.classList.remove('active'));
-        
-        document.getElementById('back-to-users-btn').addEventListener('click', () => {
-            if (messagesUnsubscribe) messagesUnsubscribe();
-            chatInterface.style.display = 'none';
-            chatSelection.style.display = 'flex';
-        });
+        // --- GESTION PIN REVOLUT ---
+        const pinInput = document.getElementById('hidden-pin-input');
+        const dots = document.querySelectorAll('.pin-dot');
 
-        // --- ETAPE 1 : CONNEXION AVEC PIN ---
-        document.getElementById('start-chat-btn').addEventListener('click', async () => {
-            const username = document.getElementById('username-input').value.trim();
-            const pin = document.getElementById('pin-input').value.trim();
+        document.getElementById('go-to-pin').onclick = () => {
+            const user = document.getElementById('username-input').value.trim();
+            if(user && !user.startsWith('[')) {
+                currentUser = user;
+                document.getElementById('chat-step-user').style.display = 'none';
+                document.getElementById('chat-step-pin').style.display = 'flex';
+                pinInput.focus();
+            }
+        };
+
+        pinInput.oninput = async () => {
+            const val = pinInput.value;
+            dots.forEach((dot, i) => dot.classList.toggle('filled', i < val.length));
             
-            // Vérifications basiques
-            if (!username || username.startsWith('[')) {
-                alert("Pseudo invalide (ne doit pas être vide ou commencer par '[').");
-                return;
-            }
-            if (!/^\d{6}$/.test(pin)) {
-                alert("Le code secret doit contenir exactement 6 chiffres.");
-                return;
-            }
-
-            try {
-                const userRef = doc(db, "users", username);
-                const userSnap = await getDoc(userRef); // On va chercher l'utilisateur dans la base
-
-                if (userSnap.exists()) {
-                    // L'utilisateur existe déjà, on vérifie son PIN
-                    const userData = userSnap.data();
-                    if (userData.pin !== pin) {
-                        alert("Code secret incorrect pour ce pseudo !");
-                        return; // On bloque la connexion
-                    }
-                    // Met à jour sa dernière connexion
-                    await setDoc(userRef, { lastSeen: serverTimestamp() }, { merge: true });
+            if(val.length === 6) {
+                const userRef = doc(db, "users", currentUser);
+                const snap = await getDoc(userRef);
+                if(snap.exists() && snap.data().pin !== val) {
+                    alert("PIN incorrect !");
+                    pinInput.value = "";
+                    dots.forEach(d => d.classList.remove('filled'));
                 } else {
-                    // L'utilisateur n'existe pas, on le crée avec ce PIN
-                    await setDoc(userRef, {
-                        username: username,
-                        pin: pin,
-                        lastSeen: serverTimestamp()
-                    });
+                    await setDoc(userRef, { username: currentUser, pin: val, lastSeen: serverTimestamp(), isTyping: false }, {merge:true});
+                    document.getElementById('chat-step-pin').style.display = 'none';
+                    document.getElementById('chat-selection').style.display = 'flex';
+                    document.getElementById('header-title').innerText = "Messages";
+                    initUserList();
                 }
-
-                // Si on arrive ici, c'est que la connexion est réussie !
-                currentUser = username;
-                chatLogin.style.display = 'none';
-                chatSelection.style.display = 'flex';
-                loadUserList();
-
-            } catch (e) {
-                console.error("Erreur de connexion:", e);
-                alert("Une erreur serveur est survenue.");
             }
-        });
+        };
 
-        // Permettre "Entrée" sur les champs
-        document.getElementById('username-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') document.getElementById('pin-input').focus(); });
-        document.getElementById('pin-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') document.getElementById('start-chat-btn').click(); });
+        // --- LISTE DES UTILISATEURS & TRI ---
+        function initUserList() {
+            onSnapshot(collection(db, "users"), (usersSnap) => {
+                onSnapshot(query(collection(db, "messages"), orderBy("timestamp", "desc")), (msgSnap) => {
+                    const allMsgs = msgSnap.docs.map(d => d.data());
+                    const listContainer = document.getElementById('user-list-container');
+                    listContainer.innerHTML = '';
 
-        // --- ETAPE 2 : LISTE DES USERS ---
-        function loadUserList() {
-            const userListDiv = document.getElementById('user-list');
-            const q = query(collection(db, "users"), orderBy("username", "asc"));
-            
-            onSnapshot(q, (snapshot) => {
-                userListDiv.innerHTML = ''; 
-
-                const globalBtn = document.createElement('button');
-                globalBtn.className = 'user-list-btn global-btn';
-                globalBtn.innerHTML = '<i class="fas fa-globe"></i> Salon Global';
-                globalBtn.onclick = () => openChat("Global");
-                userListDiv.appendChild(globalBtn);
-
-                snapshot.forEach((docSnap) => {
-                    const data = docSnap.data();
-                    const uname = data.username;
-                    
-                    if (uname !== currentUser && !uname.startsWith('[')) {
-                        const btn = document.createElement('button');
-                        btn.className = 'user-list-btn';
-                        btn.innerHTML = `<i class="fas fa-user"></i> ${uname}`;
-                        btn.onclick = () => openChat(uname);
-                        userListDiv.appendChild(btn);
-                    }
-                });
-            });
-        }
-
-        // --- ETAPE 3 : OUVRIR UN CHAT ---
-        function openChat(targetUser) {
-            currentTarget = targetUser;
-            chatSelection.style.display = 'none';
-            chatInterface.style.display = 'flex';
-            document.getElementById('chat-target-label').innerText = targetUser === "Global" ? "Salon Global" : `Message à : ${targetUser}`;
-            loadMessages();
-        }
-
-        // --- ENVOI DE MESSAGES ---
-        async function sendMessage() {
-            const msgInput = document.getElementById('msg-input');
-            const text = msgInput.value.trim();
-            
-            if (text !== "" && currentUser !== "") {
-                msgInput.value = "";
-                const expectedChatId = currentTarget === "Global" 
-                    ? "Global" 
-                    : [currentUser, currentTarget].sort().join('_');
-
-                try {
-                    await addDoc(collection(db, "messages"), {
-                        user: currentUser,
-                        text: text,
-                        chatId: expectedChatId,
-                        timestamp: serverTimestamp()
+                    // Calculer le dernier message pour chaque salon
+                    const users = [];
+                    usersSnap.forEach(u => {
+                        const uname = u.data().username;
+                        if(uname === currentUser) return;
+                        
+                        const chatId = [currentUser, uname].sort().join('_');
+                        const lastMsg = allMsgs.find(m => m.chatId === chatId);
+                        const unread = allMsgs.some(m => m.chatId === chatId && m.user !== currentUser && !m.read);
+                        
+                        users.push({ ...u.data(), lastMsg, unread });
                     });
-                } catch (e) { console.error("Erreur d'envoi: ", e); }
-            }
+
+                    // Tri : Global en premier, puis par date de message décroissante
+                    users.sort((a, b) => (b.lastMsg?.timestamp?.seconds || 0) - (a.lastMsg?.timestamp?.seconds || 0));
+
+                    // Ajouter Global
+                    const globalMsg = allMsgs.find(m => m.chatId === "Global");
+                    renderUserItem({ username: "Global", lastMsg: globalMsg }, true);
+
+                    users.forEach(u => renderUserItem(u));
+                });
+            });
         }
 
-        document.getElementById('send-btn').addEventListener('click', sendMessage);
-        document.getElementById('msg-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
-
-        // --- RECEPTION DES MESSAGES ---
-        function loadMessages() {
-            const messagesList = document.getElementById('messages-list');
-            const q = query(collection(db, "messages"), orderBy("timestamp", "asc"));
+        function renderUserItem(data, isGlobal = false) {
+            const item = document.createElement('div');
+            item.className = `user-item ${data.unread ? 'unread' : ''}`;
             
-            const expectedChatId = currentTarget === "Global" ? "Global" : [currentUser, currentTarget].sort().join('_');
+            const timeAgo = data.lastMsg?.timestamp ? formatTime(data.lastMsg.timestamp) : "";
+            const preview = data.lastMsg 
+                ? (data.lastMsg.user === currentUser ? `Vous: ${data.lastMsg.text}` : data.lastMsg.text)
+                : "Appuyer pour discuter";
 
-            messagesUnsubscribe = onSnapshot(q, (snapshot) => {
-                messagesList.innerHTML = '';
-                snapshot.forEach((docSnap) => {
-                    const data = docSnap.data();
-                    const isMine = data.user === currentUser;
-                    const msgChatId = data.chatId || "Global";
-                    
-                    if (msgChatId === expectedChatId) {
-                        let timeString = "";
-                        if(data.timestamp) {
-                            const date = data.timestamp.toDate();
-                            timeString = date.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
-                        }
+            item.innerHTML = `
+                <div class="user-top">
+                    <span class="user-name">${isGlobal ? "🌍 Salon Global" : data.username}</span>
+                    <span class="user-time">${timeAgo}</span>
+                </div>
+                <div class="user-preview">${preview}</div>
+            `;
+            item.onclick = () => openChat(data.username);
+            document.getElementById('user-list-container').appendChild(item);
+        }
 
-                        const msgDiv = document.createElement('div');
-                        msgDiv.className = `message ${isMine ? 'mine' : 'other'}`;
-                        msgDiv.innerHTML = `<span class="msg-info">${data.user} • ${timeString}</span>${data.text}`;
-                        messagesList.appendChild(msgDiv);
+        // --- CHAT LOGIQUE ---
+        async function openChat(target) {
+            currentTarget = target;
+            document.getElementById('chat-selection').style.display = 'none';
+            document.getElementById('chat-interface').style.display = 'flex';
+            document.getElementById('target-name').innerText = target;
+            
+            const chatId = target === "Global" ? "Global" : [currentUser, target].sort().join('_');
+            
+            // Marquer comme lu
+            const qUnread = query(collection(db, "messages"), where("chatId", "==", chatId), where("read", "==", false));
+            onSnapshot(qUnread, (snap) => {
+                snap.forEach(d => updateDoc(doc(db, "messages", d.id), { read: true }));
+            });
+
+            // Ecouter les messages
+            if(messagesUnsub) messagesUnsub();
+            messagesUnsub = onSnapshot(query(collection(db, "messages"), orderBy("timestamp", "asc")), (snap) => {
+                const list = document.getElementById('messages-list');
+                list.innerHTML = '';
+                let lastMine = null;
+
+                snap.forEach(d => {
+                    const m = d.data();
+                    if(m.chatId === chatId) {
+                        const div = document.createElement('div');
+                        div.className = `message ${m.user === currentUser ? 'mine' : 'other'}`;
+                        div.innerText = m.text;
+                        list.appendChild(div);
+                        if(m.user === currentUser) lastMine = m;
                     }
                 });
-                messagesList.scrollTop = messagesList.scrollHeight;
+                if(lastMine && lastMine.read && target !== "Global") {
+                    const lu = document.createElement('div'); lu.className = 'read-status'; lu.innerText = "Lu";
+                    list.appendChild(lu);
+                }
+                list.scrollTop = list.scrollHeight;
             });
+
+            // Typing indicator
+            onSnapshot(doc(db, "users", target === "Global" ? "admin" : target), (d) => {
+                const typingBox = document.getElementById('typing-box');
+                typingBox.innerText = (d.exists() && d.data().isTyping) ? `${target} écrit...` : "";
+            });
+        }
+
+        // --- ENVOI & TYPING ---
+        const msgInput = document.getElementById('msg-input');
+        msgInput.oninput = () => {
+            updateDoc(doc(db, "users", currentUser), { isTyping: true });
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => updateDoc(doc(db, "users", currentUser), { isTyping: false }), 2000);
+        };
+
+        document.getElementById('send-btn').onclick = async () => {
+            const text = msgInput.value.trim();
+            if(!text) return;
+            msgInput.value = "";
+            const chatId = currentTarget === "Global" ? "Global" : [currentUser, currentTarget].sort().join('_');
+            await addDoc(collection(db, "messages"), {
+                user: currentUser, text, chatId, read: false, timestamp: serverTimestamp()
+            });
+            updateDoc(doc(db, "users", currentUser), { isTyping: false });
+        };
+
+        document.getElementById('back-btn').onclick = () => {
+            document.getElementById('chat-interface').style.display = 'none';
+            document.getElementById('chat-selection').style.display = 'flex';
+        };
+
+        document.getElementById('open-chat-btn').onclick = () => document.getElementById('chat-popup').classList.add('active');
+        document.getElementById('close-chat-btn').onclick = () => document.getElementById('chat-popup').classList.remove('active');
+
+        function formatTime(ts) {
+            const sec = Math.floor((new Date() - ts.toDate()) / 1000);
+            if(sec < 60) return "à l'instant";
+            if(sec < 3600) return `il y a ${Math.floor(sec/60)}m`;
+            return `il y a ${Math.floor(sec/3600)}h`;
         }
     </script>
 </body>
