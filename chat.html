@@ -247,16 +247,9 @@
             <button id="cancel-reply-btn" style="background:none; border:none; color:#888; cursor:pointer; font-size:1.2rem;"><i class="fas fa-times-circle"></i></button>
         </div>
 
-        <div id="gif-panel">
-            <input type="text" id="gif-search" placeholder="Rechercher via Giphy..." style="padding:8px; border-radius:15px; border:1px solid #ddd; outline:none;">
-            <div id="gif-results"></div>
-        </div>
-
         <div class="chat-input-area">
-            <button class="gif-btn" id="toggle-gif">GIF</button>
             <input type="text" id="msg-input" placeholder="Message..." autocomplete="off">
-            <button id="send-text-btn" class="action-btn" style="display:none;"><i class="fas fa-paper-plane"></i></button>
-            <button id="record-btn" class="action-btn record-btn"><i class="fas fa-microphone"></i></button>
+            <button id="send-text-btn" class="action-btn"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
 
@@ -528,81 +521,16 @@
                         if(m.replyTo) innerHTML += `<div class="reply-quote"><b>${m.replyTo.user}</b><br>${m.replyTo.text}</div>`;
                         msgDiv.innerHTML = innerHTML;
                         
-                        // Reconnaissance Audio ET anciens bugs audios
+                        // UI simplifiee: pas d'affichage GIF/vocaux
                         if (isAudioMessage(m.text)) {
-                            const audioSrc = getAudioPayload(m.text);
-                            const audioId = `audio-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-                            
-                            // Créer le player audio avec des éléments DOM
-                            const playerDiv = document.createElement('div');
-                            playerDiv.className = 'audio-player';
-                            playerDiv.setAttribute('data-audio-id', audioId);
-                            
-                            const playBtn = document.createElement('button');
-                            playBtn.className = 'audio-play-btn';
-                            playBtn.innerHTML = '<i class="fas fa-play"></i>';
-                            playBtn.onclick = (e) => window.toggleAudio(e, audioId);
-                            
-                            const progressContainer = document.createElement('div');
-                            progressContainer.className = 'audio-progress-container';
-                            
-                            const progressBar = document.createElement('div');
-                            progressBar.className = 'audio-progress-bar';
-                            progressBar.onclick = (e) => window.seekAudio(e, audioId);
-                            
-                            const progressFill = document.createElement('div');
-                            progressFill.className = 'audio-progress-fill';
-                            progressFill.style.width = '0%';
-                            progressBar.appendChild(progressFill);
-                            
-                            const timeDiv = document.createElement('div');
-                            timeDiv.className = 'audio-time';
-                            timeDiv.innerHTML = `<span class="current">0:00</span> / <span class="duration">0:00</span>`;
-                            
-                            progressContainer.appendChild(progressBar);
-                            progressContainer.appendChild(timeDiv);
-                            
-                            const audio = document.createElement('audio');
-                            audio.id = audioId;
-                            audio.src = audioSrc;
-                            audio.preload = 'metadata';
-                            audio.style.display = 'none';
-
-                            audio.onerror = () => {
-                                playerDiv.style.display = 'none';
-                                const fallbackAudio = document.createElement('audio');
-                                fallbackAudio.controls = true;
-                                fallbackAudio.src = audioSrc;
-                                fallbackAudio.style.width = '220px';
-                                msgDiv.appendChild(fallbackAudio);
-                            };
-                            audio.onloadedmetadata = () => {
-                                const duration = playerDiv.querySelector('.audio-time .duration');
-                                if(duration) duration.innerText = formatTime(audio.duration);
-                                scrollMessagesToBottom();
-                            };
-                            
-                            playerDiv.appendChild(playBtn);
-                            playerDiv.appendChild(progressContainer);
-                            playerDiv.appendChild(audio);
-                            
-                            msgDiv.appendChild(playerDiv);
-                            msgDiv.style.background = 'transparent'; 
-                            msgDiv.style.padding = '0'; 
-                            msgDiv.style.boxShadow = 'none';
-                            
-                            // Initialiser le player audio immédiatement (une seule fois)
-                            setTimeout(() => initAudioPlayer(playerDiv), 30);
+                            const textNode = document.createElement('span');
+                            textNode.textContent = 'Message vocal';
+                            msgDiv.appendChild(textNode);
                         } 
                         else if (isGifUrl(m.text)) {
-                            const img = document.createElement('img');
-                            img.src = m.text;
-                            img.alt = 'GIF';
-                            img.loading = 'lazy';
-                            img.onload = () => scrollMessagesToBottom();
-                            msgDiv.appendChild(img);
-                            msgDiv.style.background = 'transparent'; 
-                            msgDiv.style.padding = '0';
+                            const textNode = document.createElement('span');
+                            textNode.textContent = 'GIF';
+                            msgDiv.appendChild(textNode);
                         } else {
                             const textNode = document.createElement('span');
                             textNode.textContent = m.text;
@@ -630,8 +558,7 @@
 
         msgInput.oninput = () => {
             const hasText = msgInput.value.trim().length > 0;
-            sendTextBtn.style.display = hasText ? 'flex' : 'none';
-            recordBtn.style.display = hasText ? 'none' : 'flex';
+            sendTextBtn.style.display = hasText ? 'flex' : 'flex';
             updateDoc(doc(db, "users", currentUser), { isTyping: hasText });
         };
 
@@ -783,53 +710,53 @@
             }
         };
 
-        recordBtn.addEventListener('pointerdown', (e) => {
-            e.preventDefault();
-            pointerDownAt = Date.now();
-            holdStartedRecording = false;
-            clearHoldTimer();
-            holdStartTimer = setTimeout(async () => {
-                if(!isRecording) {
-                    holdStartedRecording = true;
-                    suppressNextClick = true;
-                    await startRecord(e);
-                }
-            }, HOLD_TO_RECORD_DELAY);
-        });
-
-        const onPointerRelease = (e) => {
-            clearHoldTimer();
-            if(holdStartedRecording && isRecording) {
+        if (recordBtn) {
+            recordBtn.addEventListener('pointerdown', (e) => {
                 e.preventDefault();
-                stopRecord(e);
-            }
-            setTimeout(() => { holdStartedRecording = false; }, 0);
-        };
+                pointerDownAt = Date.now();
+                holdStartedRecording = false;
+                clearHoldTimer();
+                holdStartTimer = setTimeout(async () => {
+                    if(!isRecording) {
+                        holdStartedRecording = true;
+                        suppressNextClick = true;
+                        await startRecord(e);
+                    }
+                }, HOLD_TO_RECORD_DELAY);
+            });
 
-        recordBtn.addEventListener('pointerup', onPointerRelease);
-        recordBtn.addEventListener('pointercancel', onPointerRelease);
-        recordBtn.addEventListener('pointerleave', (e) => {
-            if(holdStartedRecording && isRecording) onPointerRelease(e);
-        });
+            const onPointerRelease = (e) => {
+                clearHoldTimer();
+                if(holdStartedRecording && isRecording) {
+                    e.preventDefault();
+                    stopRecord(e);
+                }
+                setTimeout(() => { holdStartedRecording = false; }, 0);
+            };
 
-        recordBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
+            recordBtn.addEventListener('pointerup', onPointerRelease);
+            recordBtn.addEventListener('pointercancel', onPointerRelease);
+            recordBtn.addEventListener('pointerleave', (e) => {
+                if(holdStartedRecording && isRecording) onPointerRelease(e);
+            });
 
-            // Ignore le click synthetique juste apres un long appui
-            if(suppressNextClick) {
-                suppressNextClick = false;
-                return;
-            }
+            recordBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
 
-            // Si l'appui est long, c'est deja traite par pointerup
-            if(Date.now() - pointerDownAt >= HOLD_TO_RECORD_DELAY && !isRecording) {
-                return;
-            }
+                if(suppressNextClick) {
+                    suppressNextClick = false;
+                    return;
+                }
 
-            if(!isRecording) startRecord(e);
-            else stopRecord(e);
-        });
+                if(Date.now() - pointerDownAt >= HOLD_TO_RECORD_DELAY && !isRecording) {
+                    return;
+                }
+
+                if(!isRecording) startRecord(e);
+                else stopRecord(e);
+            });
+        }
 
         // --- CUSTOM AUDIO PLAYER ---
         window.audioPlaying = null;
@@ -935,10 +862,13 @@
         let lastGifTerm = 'trending';
         const sentGifUrls = new Set();
 
-        document.getElementById('toggle-gif').onclick = () => {
-            const p = document.getElementById('gif-panel'); p.style.display = p.style.display === 'flex' ? 'none' : 'flex';
-            if (p.style.display === 'flex') searchGifs('trending');
-        };
+        const toggleGifBtn = document.getElementById('toggle-gif');
+        if (toggleGifBtn) {
+            toggleGifBtn.onclick = () => {
+                const p = document.getElementById('gif-panel'); p.style.display = p.style.display === 'flex' ? 'none' : 'flex';
+                if (p.style.display === 'flex') searchGifs('trending');
+            };
+        }
 
         const shuffleArray = (arr) => {
             const copy = [...arr];
@@ -1078,7 +1008,10 @@
                 });
             }
         }
-        document.getElementById('gif-search').oninput = (e) => searchGifs(e.target.value || 'trending');
+        const gifSearchInput = document.getElementById('gif-search');
+        if (gifSearchInput) {
+            gifSearchInput.oninput = (e) => searchGifs(e.target.value || 'trending');
+        }
 
         // RETOUR
         document.getElementById('back-btn').onclick = () => {
