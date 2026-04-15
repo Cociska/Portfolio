@@ -9,13 +9,16 @@
     <style>
         :root { --bg-color: #E8E6E1; --accent-color: #8B5E3C; --text-dark: #2D2D2D; }
         body { background-color: #f9f9f9; color: var(--text-dark); font-family: 'Roboto', sans-serif; margin: 0; padding: 0; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
-        .btn { padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer; border: none; font-size: 1rem; font-family: 'Roboto', sans-serif; }
-        .btn-primary { background: var(--text-dark); color: white; }
+        
+        /* Layout Global */
         .chat-header { background: var(--text-dark); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 10; }
         .chat-header h3 { margin: 0; font-family: 'Montserrat', sans-serif; font-size: 1.2rem; }
         .header-btn { color: white; text-decoration: none; font-size: 1.5rem; }
+        
         .app-view { flex: 1; display: none; flex-direction: column; overflow: hidden; }
         .app-view.active { display: flex; }
+
+        /* Login & PIN */
         .chat-login { padding: 30px; align-items: center; justify-content: center; text-align: center; }
         .chat-login input { padding: 12px; border-radius: 8px; border: 1px solid #ccc; width: 80%; max-width: 300px; margin-bottom: 20px; outline: none; font-size: 16px !important; }
         .pin-wrapper { position: relative; width: 200px; height: 50px; margin: 20px auto; }
@@ -23,42 +26,79 @@
         .pin-dot { width: 18px; height: 18px; border: 2px solid #ccc; border-radius: 50%; transition: 0.2s; }
         .pin-dot.filled { background: var(--accent-color); border-color: var(--accent-color); transform: scale(1.1); }
         .hidden-pin-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: text; z-index: 10; font-size: 16px !important; }
+
+        /* Liste Users */
         .chat-selection { overflow-y: auto; background: white; }
-        .user-item { padding: 15px 20px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; flex-direction: column; gap: 5px; transition: 0.2s; }
-        .user-item:active { background: #f0ede9; }
-        .user-item.unread { background: #fdfbf8; border-left: 4px solid var(--accent-color); }
-        .user-top { display: flex; justify-content: space-between; align-items: center; }
+        .user-item { padding: 15px 20px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; flex-direction: column; gap: 5px; }
         .user-name { font-size: 1.05rem; font-weight: bold; }
-        .user-item:not(.unread) .user-name { font-weight: normal; }
-        .user-time { font-size: 0.8rem; color: #888; }
         .user-preview { font-size: 0.9rem; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Chat Interface */
         .chat-interface-header { background: #f0ede9; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
         .header-info { display: flex; flex-direction: column; align-items: center; flex: 1; }
-        .header-name { font-weight: bold; font-size: 1rem; color: var(--text-dark); }
-        .typing-box { font-size: 0.75rem; color: var(--accent-color); font-style: italic; min-height: 15px; margin-top: 2px;}
-        .messages-list { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; background: white; }
-        .message { max-width: 80%; padding: 10px 15px; border-radius: 18px; font-size: 0.95rem; position: relative; word-wrap: break-word; line-height: 1.4; }
-        .message.mine { background: var(--accent-color); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
-        .message.other { background: #f0f0f0; align-self: flex-start; border-bottom-left-radius: 4px; }
-        .read-status { font-size: 0.75rem; align-self: flex-end; margin-top: -6px; margin-right: 5px; color: #888; }
-        .chat-input-area { display: flex; gap: 10px; padding: 10px 15px; background: white; border-top: 1px solid #eee; padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
-        .chat-input-area input { flex: 1; padding: 12px 18px; border-radius: 25px; border: 1px solid #ddd; outline: none; background: #f9f9f9; font-size: 16px !important; }
-        .send-btn { background: var(--accent-color); color: white; border: none; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; cursor: pointer; }
+        .typing-box { font-size: 0.75rem; color: var(--accent-color); font-style: italic; min-height: 15px; }
+
+        /* Bulles de message et Groupement */
+        .messages-list { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; background: white; }
+        
+        .msg-group { display: flex; flex-direction: column; margin-top: 10px; }
+        .msg-group.is-mine { align-items: flex-end; }
+        .msg-group.is-other { align-items: flex-start; }
+        
+        .sender-name { font-size: 0.7rem; color: #888; margin-bottom: 2px; margin-left: 5px; margin-right: 5px; }
+        
+        .message { 
+            max-width: 75%; padding: 8px 12px; border-radius: 18px; font-size: 0.95rem; 
+            word-wrap: break-word; line-height: 1.4; margin-bottom: 2px;
+            position: relative;
+        }
+        
+        .message.mine { background: var(--accent-color); color: white; border-bottom-right-radius: 4px; }
+        .message.other { background: #f0f0f0; color: black; border-bottom-left-radius: 4px; }
+        
+        /* Ajustement quand plusieurs messages se suivent */
+        .message.is-middle { border-radius: 18px !important; }
+        .message.mine.is-middle { border-top-right-radius: 4px !important; border-bottom-right-radius: 4px !important; }
+        .message.other.is-middle { border-top-left-radius: 4px !important; border-bottom-left-radius: 4px !important; }
+        
+        .message.is-last { border-radius: 18px; }
+        .message.mine.is-last { border-top-right-radius: 4px !important; }
+        .message.other.is-last { border-top-left-radius: 4px !important; }
+
+        .message img { max-width: 100%; border-radius: 10px; display: block; }
+
+        /* Barre d'envoi et GIF */
+        .chat-input-area { display: flex; gap: 8px; padding: 10px; border-top: 1px solid #eee; background: white; align-items: center; }
+        .chat-input-area input { flex: 1; padding: 10px 15px; border-radius: 20px; border: 1px solid #ddd; outline: none; font-size: 16px !important; }
+        
+        .gif-btn { background: #eee; color: #555; border: none; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; font-weight: bold; font-size: 0.7rem; }
+        .send-btn { background: var(--accent-color); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; cursor: pointer; }
+
+        /* Panel GIF */
+        #gif-panel { 
+            display: none; height: 250px; background: white; border-top: 1px solid #ddd; 
+            flex-direction: column; padding: 10px;
+        }
+        #gif-results { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; overflow-y: auto; flex: 1; margin-top: 10px; }
+        #gif-results img { width: 100%; height: 80px; object-fit: cover; border-radius: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
+
     <div class="chat-header">
         <a href="index.html" class="header-btn"><i class="fas fa-home"></i></a>
-        <h3 id="main-title">Messagerie</h3>
+        <h3 id="main-title">Adam Chat</h3>
         <div style="width: 24px;"></div>
     </div>
+
     <div class="app-view active chat-login" id="chat-step-user">
-        <h2 style="margin-top:0;">Identifiez-vous</h2>
-        <input type="text" id="username-input" placeholder="Pseudo..." autocomplete="off">
-        <button class="btn btn-primary" id="go-to-pin" style="width: 80%;">Continuer</button>
+        <h2>Bienvenue</h2>
+        <input type="text" id="username-input" placeholder="Ton pseudo..." autocomplete="off">
+        <button class="btn btn-primary" id="go-to-pin" style="width: 80%;">Suivant</button>
     </div>
+
     <div class="app-view chat-login" id="chat-step-pin">
-        <h2 style="margin-top:0;">Code Secret</h2>
+        <h2>Code Secret</h2>
         <div class="pin-wrapper">
             <input type="password" id="hidden-pin-input" class="hidden-pin-input" maxlength="6" inputmode="numeric">
             <div class="pin-dots-container">
@@ -67,19 +107,30 @@
             </div>
         </div>
     </div>
+
     <div class="app-view chat-selection" id="chat-selection"><div id="user-list-container"></div></div>
+
     <div class="app-view" id="chat-interface">
         <div class="chat-interface-header">
             <button id="back-btn" style="border:none; background:none; cursor:pointer; font-size: 1.2rem;"><i class="fas fa-chevron-left"></i></button>
-            <div class="header-info"><span id="target-name" class="header-name"></span><span id="typing-box" class="typing-box"></span></div>
+            <div class="header-info"><span id="target-name" class="header-name" style="font-weight:bold;"></span><span id="typing-box" class="typing-box"></span></div>
             <div style="width: 24px;"></div>
         </div>
+        
         <div class="messages-list" id="messages-list"></div>
+
+        <div id="gif-panel">
+            <input type="text" id="gif-search" placeholder="Rechercher un GIF..." style="padding:8px; border-radius:15px; border:1px solid #ddd; outline:none;">
+            <div id="gif-results"></div>
+        </div>
+
         <div class="chat-input-area">
+            <button class="gif-btn" id="toggle-gif">GIF</button>
             <input type="text" id="msg-input" placeholder="Message..." autocomplete="off">
             <button id="send-btn" class="send-btn"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc, getDoc, updateDoc, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -103,6 +154,7 @@
         const pinInput = document.getElementById('hidden-pin-input');
         const dots = document.querySelectorAll('.pin-dot');
 
+        // NAVIGATION
         document.getElementById('go-to-pin').onclick = () => {
             const user = document.getElementById('username-input').value.trim();
             if(user && !user.startsWith('[')) {
@@ -115,15 +167,14 @@
 
         pinInput.oninput = async () => {
             pinInput.value = pinInput.value.replace(/[^0-9]/g, '');
-            const val = pinInput.value;
-            dots.forEach((dot, i) => dot.classList.toggle('filled', i < val.length));
-            if(val.length === 6) {
+            dots.forEach((dot, i) => dot.classList.toggle('filled', i < pinInput.value.length));
+            if(pinInput.value.length === 6) {
                 const userRef = doc(db, "users", currentUser);
                 const snap = await getDoc(userRef);
-                if(snap.exists() && snap.data().pin !== val) {
+                if(snap.exists() && snap.data().pin !== pinInput.value) {
                     alert("PIN incorrect !"); pinInput.value = ""; dots.forEach(d => d.classList.remove('filled'));
                 } else {
-                    await setDoc(userRef, { username: currentUser, pin: val, lastSeen: serverTimestamp(), isTyping: false }, {merge:true});
+                    await setDoc(userRef, { username: currentUser, pin: pinInput.value, lastSeen: serverTimestamp(), isTyping: false }, {merge:true});
                     document.getElementById('chat-step-pin').classList.remove('active');
                     document.getElementById('chat-selection').classList.add('active');
                     initUserList();
@@ -131,6 +182,7 @@
             }
         };
 
+        // LISTE USERS
         function initUserList() {
             onSnapshot(collection(db, "users"), (usersSnap) => {
                 onSnapshot(query(collection(db, "messages"), orderBy("timestamp", "desc")), (msgSnap) => {
@@ -147,8 +199,7 @@
                         users.push({ ...u.data(), lastMsg, unread });
                     });
                     users.sort((a, b) => (b.lastMsg?.timestamp?.seconds || 0) - (a.lastMsg?.timestamp?.seconds || 0));
-                    const globalMsg = allMsgs.find(m => m.chatId === "Global");
-                    renderUserItem({ username: "Global", lastMsg: globalMsg }, true);
+                    renderUserItem({ username: "Global", lastMsg: allMsgs.find(m => m.chatId === "Global") }, true);
                     users.forEach(u => renderUserItem(u));
                 });
             });
@@ -157,18 +208,18 @@
         function renderUserItem(data, isGlobal = false) {
             const item = document.createElement('div');
             item.className = `user-item ${data.unread ? 'unread' : ''}`;
-            const timeAgo = data.lastMsg?.timestamp ? formatTime(data.lastMsg.timestamp) : "";
-            const preview = data.lastMsg ? (data.lastMsg.user === currentUser ? `Vous: ${data.lastMsg.text}` : data.lastMsg.text) : "Appuyer pour discuter";
-            item.innerHTML = `<div class="user-top"><span class="user-name">${isGlobal ? "🌍 Salon Global" : data.username}</span><span class="user-time">${timeAgo}</span></div><div class="user-preview">${preview}</div>`;
+            const preview = data.lastMsg ? (data.lastMsg.text.startsWith('http') ? "Sent a GIF" : data.lastMsg.text) : "Appuyer pour discuter";
+            item.innerHTML = `<div class="user-top"><span class="user-name">${isGlobal ? "🌍 Global" : data.username}</span></div><div class="user-preview">${preview}</div>`;
             item.onclick = () => openChat(data.username);
             document.getElementById('user-list-container').appendChild(item);
         }
 
+        // CHAT LOGIQUE
         async function openChat(target) {
             currentTarget = target;
             document.getElementById('chat-selection').classList.remove('active');
             document.getElementById('chat-interface').classList.add('active');
-            document.getElementById('target-name').innerText = target === "Global" ? "🌍 Salon Global" : target;
+            document.getElementById('target-name').innerText = target;
             const chatId = target === "Global" ? "Global" : [currentUser, target].sort().join('_');
             
             if(unreadUnsub) unreadUnsub();
@@ -179,58 +230,95 @@
             if(messagesUnsub) messagesUnsub();
             messagesUnsub = onSnapshot(query(collection(db, "messages"), orderBy("timestamp", "asc")), (snap) => {
                 const list = document.getElementById('messages-list');
-                list.innerHTML = ''; let lastMine = null;
+                list.innerHTML = ''; 
+                
+                let lastUser = null;
+                let currentGroup = null;
+
                 snap.forEach(d => {
                     const m = d.data();
                     if(m.chatId === chatId) {
-                        const div = document.createElement('div'); div.className = `message ${m.user === currentUser ? 'mine' : 'other'}`;
-                        div.innerText = m.text; list.appendChild(div);
-                        if(m.user === currentUser) lastMine = m;
+                        // Créer un groupe si l'utilisateur change
+                        if (m.user !== lastUser) {
+                            currentGroup = document.createElement('div');
+                            currentGroup.className = `msg-group ${m.user === currentUser ? 'is-mine' : 'is-other'}`;
+                            
+                            // Afficher le nom en petit (si ce n'est pas nous)
+                            if (m.user !== currentUser) {
+                                const nameLabel = document.createElement('span');
+                                nameLabel.className = 'sender-name';
+                                nameLabel.innerText = m.user;
+                                currentGroup.appendChild(nameLabel);
+                            }
+                            list.appendChild(currentGroup);
+                        }
+
+                        // Créer la bulle
+                        const msgDiv = document.createElement('div');
+                        msgDiv.className = `message ${m.user === currentUser ? 'mine' : 'other'}`;
+                        
+                        // Si c'est un GIF (lien Giphy)
+                        if (m.text.includes('giphy.com')) {
+                            msgDiv.innerHTML = `<img src="${m.text}" alt="GIF">`;
+                            msgDiv.style.background = 'transparent';
+                            msgDiv.style.padding = '0';
+                        } else {
+                            msgDiv.innerText = m.text;
+                        }
+
+                        currentGroup.appendChild(msgDiv);
+                        lastUser = m.user;
                     }
                 });
-                if(lastMine && lastMine.read && target !== "Global") {
-                    const lu = document.createElement('div'); lu.className = 'read-status'; lu.innerText = "Lu"; list.appendChild(lu);
-                }
                 list.scrollTop = list.scrollHeight;
             });
+        }
 
-            if (target !== "Global") {
-                onSnapshot(doc(db, "users", target), (d) => {
-                    document.getElementById('typing-box').innerText = (d.exists() && d.data().isTyping) ? `en train d'écrire...` : "";
-                });
+        // ENVOI & GIFS
+        async function sendFinal(content) {
+            const chatId = currentTarget === "Global" ? "Global" : [currentUser, currentTarget].sort().join('_');
+            await addDoc(collection(db, "messages"), { user: currentUser, text: content, chatId, read: false, timestamp: serverTimestamp() });
+            
+            if (currentTarget !== "Global") {
+                fetch(`https://ntfy.sh/cociska_chat_adam_${currentTarget.toLowerCase()}`, { method: 'POST', body: `${currentUser} : ${content.includes('giphy') ? 'sent a GIF' : content}` });
             }
         }
 
-        const msgInput = document.getElementById('msg-input');
-        msgInput.oninput = () => { updateDoc(doc(db, "users", currentUser), { isTyping: msgInput.value.trim().length > 0 }); };
-
-        document.getElementById('send-btn').onclick = async () => {
-            const text = msgInput.value.trim(); if(!text) return;
-            msgInput.value = "";
-            const chatId = currentTarget === "Global" ? "Global" : [currentUser, currentTarget].sort().join('_');
-            await addDoc(collection(db, "messages"), { user: currentUser, text, chatId, read: false, timestamp: serverTimestamp() });
-            updateDoc(doc(db, "users", currentUser), { isTyping: false });
-            
-            if (currentTarget !== "Global") {
-                const topic = `cociska_chat_adam_${currentTarget.toLowerCase()}`;
-                fetch(`https://ntfy.sh/${topic}`, { method: 'POST', body: `${currentUser} : ${text}`, headers: { 'Title': 'Message sur cociska.dev', 'Click': window.location.href, 'Tags': 'speech_balloon' } }).catch(e => console.log(e));
-            }
+        document.getElementById('send-btn').onclick = () => {
+            const t = document.getElementById('msg-input').value.trim();
+            if(t) { sendFinal(t); document.getElementById('msg-input').value = ""; }
         };
 
+        // GIPHY INTEGRATION
+        const GIPHY_KEY = "dc6zaTOxFJmzC"; // Clé publique de test
+        document.getElementById('toggle-gif').onclick = () => {
+            const p = document.getElementById('gif-panel');
+            p.style.display = p.style.display === 'flex' ? 'none' : 'flex';
+            if (p.style.display === 'flex') searchGifs('trending');
+        };
+
+        async function searchGifs(term) {
+            const url = term === 'trending' 
+                ? `https://api.giphy.com/v1/gifs/trending?api_key=${GIPHY_KEY}&limit=12`
+                : `https://api.giphy.com/v1/gifs/search?api_key=${GIPHY_KEY}&q=${term}&limit=12`;
+            const resp = await fetch(url);
+            const data = await resp.json();
+            const resDiv = document.getElementById('gif-results');
+            resDiv.innerHTML = '';
+            data.data.forEach(g => {
+                const img = document.createElement('img');
+                img.src = g.images.fixed_height.url;
+                img.onclick = () => { sendFinal(img.src); document.getElementById('gif-panel').style.display = 'none'; };
+                resDiv.appendChild(img);
+            });
+        }
+
+        document.getElementById('gif-search').oninput = (e) => searchGifs(e.target.value || 'trending');
+
         document.getElementById('back-btn').onclick = () => {
-            if(messagesUnsub) messagesUnsub(); if(unreadUnsub) unreadUnsub();
-            updateDoc(doc(db, "users", currentUser), { isTyping: false });
             document.getElementById('chat-interface').classList.remove('active');
             document.getElementById('chat-selection').classList.add('active');
         };
-
-        function formatTime(ts) {
-            const sec = Math.floor((new Date() - ts.toDate()) / 1000);
-            if(sec < 60) return "à l'instant";
-            if(sec < 3600) return `il y a ${Math.floor(sec/60)} min`;
-            if(sec < 86400) return `il y a ${Math.floor(sec/3600)} h`;
-            return `il y a ${Math.floor(sec/86400)} j`;
-        }
     </script>
 </body>
 </html>
