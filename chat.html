@@ -335,6 +335,11 @@
             return 0;
         };
 
+        const resolveMessageTimeMs = (msg) => {
+            if (!msg) return 0;
+            return getTimestampMs(msg.timestamp) || getTimestampMs(msg.createdAtClient) || 0;
+        };
+
         const formatRelativeTime = (timestampMs) => {
             if (!timestampMs) return 'à l\'instant';
             const diff = Math.max(0, Date.now() - timestampMs);
@@ -500,7 +505,7 @@
                         const unread = allMsgs.some(m => m.chatId === chatId && m.user !== currentUser && !m.read);
                         users.push({ ...u.data(), lastMsg, unread });
                     });
-                    users.sort((a, b) => getTimestampMs(b.lastMsg?.timestamp) - getTimestampMs(a.lastMsg?.timestamp));
+                    users.sort((a, b) => resolveMessageTimeMs(b.lastMsg) - resolveMessageTimeMs(a.lastMsg));
                     renderUserItem({ username: "Salon Global", lastMsg: allMsgs.find(m => m.chatId === "Global") }, true);
                     users.forEach(u => renderUserItem(u));
                 });
@@ -520,7 +525,7 @@
                 else preview = data.lastMsg.text;
 
                 if (data.lastMsg.user === currentUser) preview = `Vous : ${preview}`;
-                const tsMs = getTimestampMs(data.lastMsg.timestamp);
+                const tsMs = resolveMessageTimeMs(data.lastMsg);
                 timeText = formatRelativeTime(tsMs);
             }
 
@@ -612,7 +617,7 @@
                 snap.forEach(d => {
                     const m = d.data();
                     if(m.chatId === chatId) {
-                        const currentMsgTime = getTimestampMs(m.timestamp);
+                        const currentMsgTime = resolveMessageTimeMs(m);
                         if (previousMsgTime && currentMsgTime && (currentMsgTime - previousMsgTime) > 90 * 60 * 1000) {
                             const divider = document.createElement('div');
                             divider.className = 'chat-time-divider';
@@ -724,7 +729,7 @@
 
         async function sendFinal(content) {
             const chatId = currentTarget === "Global" ? "Global" : [currentUser, currentTarget].sort().join('_');
-            const msgData = { user: currentUser, text: content, chatId, read: false, timestamp: serverTimestamp() };
+            const msgData = { user: currentUser, text: content, chatId, read: false, timestamp: serverTimestamp(), createdAtClient: Date.now() };
             if (replyingTo) msgData.replyTo = replyingTo;
             await addDoc(collection(db, "messages"), msgData);
             document.getElementById('cancel-reply-btn').click();
