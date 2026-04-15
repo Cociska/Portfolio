@@ -111,6 +111,7 @@
             padding: 12px; background: rgba(0,0,0,0.05); 
             border-radius: 18px; width: fit-content; max-width: 280px; 
             margin-top: 5px; cursor: pointer; transition: 0.2s;
+            border: 1px solid rgba(0,0,0,0.15); min-height: 44px;
         }
         .message.mine .audio-player { background: rgba(255,255,255,0.15); }
         .audio-player:hover { background: rgba(0,0,0,0.08); }
@@ -279,6 +280,18 @@
         let currentUser = ""; let currentTarget = ""; let messagesUnsub = null; let unreadUnsub = null;
         let usersData = {}; const DEFAULT_PFP = "Default_pfp.jpg"; 
         let replyingTo = null;
+
+        const isAudioMessage = (text) => typeof text === 'string' && (/^\[AUDIO\]/i.test(text) || /^data:audio/i.test(text));
+        const getAudioPayload = (text) => (text || '').replace(/^\[AUDIO\]/i, '');
+        const isGifUrl = (text) => typeof text === 'string' && /(giphy\.com|tenor\.com|media\d*\.tenor\.com|\.gif($|\?))/i.test(text);
+
+        function scrollMessagesToBottom() {
+            const list = document.getElementById('messages-list');
+            if(!list) return;
+            list.scrollTop = list.scrollHeight;
+            requestAnimationFrame(() => { list.scrollTop = list.scrollHeight; });
+            setTimeout(() => { list.scrollTop = list.scrollHeight; }, 120);
+        }
 
         function showView(viewId) {
             document.querySelectorAll('.app-view').forEach(el => el.classList.remove('active'));
@@ -515,8 +528,8 @@
                         msgDiv.innerHTML = innerHTML;
                         
                         // Reconnaissance Audio ET anciens bugs audios
-                        if (m.text.startsWith('[AUDIO]') || m.text.startsWith('data:audio')) {
-                            const audioSrc = m.text.replace('[AUDIO]', '');
+                        if (isAudioMessage(m.text)) {
+                            const audioSrc = getAudioPayload(m.text);
                             const audioId = `audio-${Date.now()}-${Math.random()}`;
                             
                             // Créer le player audio avec des éléments DOM
@@ -551,7 +564,18 @@
                             const audio = document.createElement('audio');
                             audio.id = audioId;
                             audio.src = audioSrc;
+                            audio.preload = 'metadata';
                             audio.style.display = 'none';
+
+                            audio.onerror = () => {
+                                playerDiv.style.display = 'none';
+                                const fallbackAudio = document.createElement('audio');
+                                fallbackAudio.controls = true;
+                                fallbackAudio.src = audioSrc;
+                                fallbackAudio.style.width = '220px';
+                                msgDiv.appendChild(fallbackAudio);
+                            };
+                            audio.onloadedmetadata = () => scrollMessagesToBottom();
                             
                             playerDiv.appendChild(playBtn);
                             playerDiv.appendChild(progressContainer);
@@ -565,15 +589,19 @@
                             // Initialiser le player audio immédiatement
                             setTimeout(() => updateAudioTime(audioId), 50);
                         } 
-                        else if (m.text.includes('giphy.com')) {
+                        else if (isGifUrl(m.text)) {
                             const img = document.createElement('img');
                             img.src = m.text;
                             img.alt = 'GIF';
+                            img.loading = 'lazy';
+                            img.onload = () => scrollMessagesToBottom();
                             msgDiv.appendChild(img);
                             msgDiv.style.background = 'transparent'; 
                             msgDiv.style.padding = '0';
                         } else {
-                            msgDiv.textContent = m.text;
+                            const textNode = document.createElement('span');
+                            textNode.textContent = m.text;
+                            msgDiv.appendChild(textNode);
                         } 
                         
                         msgContainer.appendChild(msgDiv);
@@ -583,10 +611,7 @@
                         lastUser = m.user;
                     }
                 });
-                // Force scroll au bas après rendu
-                setTimeout(() => {
-                    list.scrollTop = list.scrollHeight;
-                }, 0);
+                scrollMessagesToBottom();
             });
 
             if (target !== "Global") onSnapshot(doc(db, "users", target), (d) => document.getElementById('typing-box').innerText = (d.exists() && d.data().isTyping) ? `écrit...` : "");
@@ -622,15 +647,33 @@
         const MAX_RECORDING_TIME = 30000; 
         let recordingTimer = null;
         let audioStream = null;
-        let recordingStartTime = 0;
+        let ignoreClickUntil = 0;
         
         const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+        const getRecorderMimeType = () => {
+            const preferred = [
+                'audio/webm;codecs=opus',
+                'audio/webm',
+                'audio/mp4',
+                'audio/ogg;codecs=opus'
+            ];
+            for (const type of preferred) {
+                if (window.MediaRecorder && MediaRecorder.isTypeSupported(type)) return type;
+            }
+            return '';
+        };
         
         const startRecord = async (e) => {
             if(isRecording) return;
             if(e && e.preventDefault) e.preventDefault();
             
             try {
+                if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) {
+                    alert("Votre appareil/navigateur ne supporte pas l'enregistrement vocal.");
+                    return;
+                }
+
                 if(!audioStream) {
                     audioStream = await navigator.mediaDevices.getUserMedia({ 
                         audio: { 
@@ -641,21 +684,25 @@
                     });
                 }
                 
-                const mimeType = 'audio/webm;codecs=opus';
-                mediaRecorder = new MediaRecorder(audioStream, { 
-                    mimeType: mimeType,
-                    audioBitsPerSecond: 48000  
-                }); 
+                const mimeType = getRecorderMimeType();
+                if(mimeType) {
+                    mediaRecorder = new MediaRecorder(audioStream, { 
+                        mimeType,
+                        audioBitsPerSecond: 48000
+                    });
+                } else {
+                    mediaRecorder = new MediaRecorder(audioStream);
+                }
                 
                 audioChunks = [];
-                recordingStartTime = Date.now();
                 
                 mediaRecorder.ondataavailable = (evt) => {
                     if(evt.data.size > 0) audioChunks.push(evt.data);
                 };
                 
                 mediaRecorder.onstop = async () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const finalType = (mimeType || 'audio/webm');
+                    const audioBlob = new Blob(audioChunks, { type: finalType });
                     
                     if(audioBlob.size > 400000) {
                         alert("Vocal trop volumineux.");
@@ -663,7 +710,7 @@
                         return;
                     }
                     
-                    if(audioBlob.size < 10000) {
+                    if(audioBlob.size < 1200) {
                         alert("Vocal trop court.");
                         audioChunks = [];
                         return;
@@ -724,14 +771,31 @@
 
         // Event listeners - Desktop VS Mobile
         if(isMobileDevice) {
-            // Mobile: Click = toggle record
+            // Mobile: touchstart/touchend + fallback click
+            recordBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                ignoreClickUntil = Date.now() + 500;
+                startRecord(e);
+            }, { passive: false });
+
+            recordBtn.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                stopRecord(e);
+            }, { passive: false });
+
+            recordBtn.addEventListener('touchcancel', (e) => {
+                e.preventDefault();
+                stopRecord(e);
+            }, { passive: false });
+
             recordBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                if(Date.now() < ignoreClickUntil) return;
                 if(!isRecording) {
-                    startRecord();
+                    startRecord(e);
                 } else {
-                    stopRecord();
+                    stopRecord(e);
                 }
             });
         } else {
@@ -844,10 +908,19 @@
             observer.observe(messagesList, { childList: true, subtree: true });
         }
 
-        // GIFS - Fallback avec plus de variété
+        // GIFS - Tenor dynamique + fallback varié
         document.getElementById('toggle-gif').onclick = () => {
             const p = document.getElementById('gif-panel'); p.style.display = p.style.display === 'flex' ? 'none' : 'flex';
             if (p.style.display === 'flex') searchGifs('trending');
+        };
+
+        const shuffleArray = (arr) => {
+            const copy = [...arr];
+            for (let i = copy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [copy[i], copy[j]] = [copy[j], copy[i]];
+            }
+            return copy;
         };
 
         async function searchGifs(term) {
@@ -855,40 +928,47 @@
                 const resDiv = document.getElementById('gif-results'); 
                 resDiv.innerHTML = '<p style="text-align:center; grid-column:span 3;">Chargement...</p>';
                 
-                // Essayer Giphy API
-                const apiKey = "dc6zaTOxFJmzC";
+                const apiKey = "LIVDSRZULELA";
+                const clientKey = "portfolio_chat";
                 const url = term === 'trending' 
-                    ? `https://api.giphy.com/v1/gifs/trending?api_key=${apiKey}&limit=12&rating=g`
-                    : `https://api.giphy.com/v1/gifs/search?q=${encodeURIComponent(term)}&api_key=${apiKey}&limit=12&rating=g`;
+                    ? `https://tenor.googleapis.com/v2/featured?key=${apiKey}&client_key=${clientKey}&limit=18&media_filter=tinygif`
+                    : `https://tenor.googleapis.com/v2/search?q=${encodeURIComponent(term)}&key=${apiKey}&client_key=${clientKey}&limit=18&media_filter=tinygif&random=true`;
                 
                 const resp = await fetch(url);
+                if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
                 const data = await resp.json();
                 
                 resDiv.innerHTML = '';
                 
-                if(data.data && data.data.length > 0) { 
-                    data.data.forEach(g => {
+                const results = shuffleArray(data.results || []);
+
+                if(results.length > 0) {
+                    results.slice(0, 12).forEach(g => {
+                        const tiny = g?.media_formats?.tinygif?.url;
+                        const full = g?.media_formats?.gif?.url || tiny;
+                        if(!tiny || !full) return;
+
                         const img = document.createElement('img');
-                        img.src = g.images.fixed_height_small.url;
+                        img.src = tiny;
                         img.onclick = () => { 
-                            sendFinal(g.images.fixed_height.url); 
+                            sendFinal(full); 
                             document.getElementById('gif-panel').style.display = 'none'; 
                         };
                         img.onerror = () => { img.style.display = 'none'; };
                         resDiv.appendChild(img);
                     });
-                    if(resDiv.innerHTML === '') throw new Error("Pas d'images chargées");
+                    if(!resDiv.children.length) throw new Error("Pas d'images chargées");
                 } else {
                     throw new Error("Pas de résultats");
                 }
             } catch(e) { 
                 console.error("GIF search error:", e);
-                // Mode fallback - GIFs de secours PLUS variés
+                // Mode fallback local: varie selon la recherche
                 const resDiv = document.getElementById('gif-results');
                 resDiv.innerHTML = '';
                 
-                const backupGifs = {
-                    'trending': [
+                const fallbackPool = {
+                    trending: [
                         'https://media.giphy.com/media/l0HlDy9x8FZo0XO1i/giphy.gif',
                         'https://media.giphy.com/media/g9pgDWjmvSo0M/giphy.gif',
                         'https://media.giphy.com/media/5xtDarmwhorCZ2mHFAI/giphy.gif',
@@ -900,19 +980,38 @@
                         'https://media.giphy.com/media/4T7e4DmcrP9du/giphy.gif',
                         'https://media.giphy.com/media/oCybuuAQeeFSmxIYcQ/giphy.gif',
                         'https://media.giphy.com/media/MDJ4SVeQO66R2/giphy.gif',
-                        'https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif'
+                        'https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif',
+                        'https://media.giphy.com/media/3o7aD2saalBwwftBIY/giphy.gif',
+                        'https://media.giphy.com/media/QBd2kLB5qDmysEXre9/giphy.gif'
                     ],
-                    'funny': ['https://media.giphy.com/media/l0HlDy9x8FZo0XO1i/giphy.gif', 'https://media.giphy.com/media/xTiTnZ7UdFQr63LlFW/giphy.gif'],
-                    'love': ['https://media.giphy.com/media/g9pgDWjmvSo0M/giphy.gif'],
-                    'dance': ['https://media.giphy.com/media/3ohhwxmNcPvParqVoc/giphy.gif'],
-                    'cry': ['https://media.giphy.com/media/13XW2MJkY6Z9iE/giphy.gif'],
-                    'sleep': ['https://media.giphy.com/media/IOaWjj9O07g5i/giphy.gif'],
+                    funny: [
+                        'https://media.giphy.com/media/l0HlDy9x8FZo0XO1i/giphy.gif',
+                        'https://media.giphy.com/media/xTiTnZ7UdFQr63LlFW/giphy.gif',
+                        'https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif'
+                    ],
+                    love: [
+                        'https://media.giphy.com/media/g9pgDWjmvSo0M/giphy.gif',
+                        'https://media.giphy.com/media/26BRv0ThflsHCqDrG/giphy.gif'
+                    ],
+                    dance: [
+                        'https://media.giphy.com/media/3ohhwxmNcPvParqVoc/giphy.gif',
+                        'https://media.giphy.com/media/11lxCeKo6cHkJy/giphy.gif'
+                    ],
+                    cry: [
+                        'https://media.giphy.com/media/13XW2MJkY6Z9iE/giphy.gif',
+                        'https://media.giphy.com/media/OPU6wzx8JrHna/giphy.gif'
+                    ],
+                    sleep: [
+                        'https://media.giphy.com/media/IOaWjj9O07g5i/giphy.gif',
+                        'https://media.giphy.com/media/3orieYJ5E6MBrv0YSI/giphy.gif'
+                    ]
                 };
-                
-                const gifs = backupGifs[term] || backupGifs['trending'];
-                const uniqueGifs = [...new Set(gifs)];
-                
-                uniqueGifs.slice(0, 12).forEach(url => {
+
+                const key = (term || 'trending').toLowerCase();
+                const selected = fallbackPool[key] || fallbackPool.trending;
+                const gifs = shuffleArray(selected).slice(0, 12);
+
+                gifs.forEach(url => {
                     const img = document.createElement('img');
                     img.src = url;
                     img.onclick = () => { 
