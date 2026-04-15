@@ -44,6 +44,22 @@
         .user-time { font-size: 0.8rem; color: #888; }
         .user-preview { font-size: 0.9rem; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+        .chat-time-divider {
+            align-self: center;
+            font-size: 0.75rem;
+            color: #888;
+            background: #f3f3f3;
+            padding: 4px 10px;
+            border-radius: 999px;
+            margin: 12px 0 6px;
+        }
+        .msg-read-status {
+            font-size: 0.72rem;
+            color: #888;
+            margin-top: 4px;
+            margin-right: 6px;
+        }
+
         /* Modal Profil dans le Chat */
         #user-info-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; }
         .user-info-box { background: white; padding: 25px; border-radius: 20px; text-align: center; width: 80%; max-width: 300px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
@@ -70,7 +86,44 @@
         .side-action.right { justify-content: flex-end; }
         .header-info { display: flex; flex-direction: column; align-items: center; text-align: center; overflow: hidden; }
         .header-name { font-weight: bold; font-size: 1.05rem; color: var(--text-dark); white-space: nowrap; }
-        .typing-box { font-size: 0.75rem; color: var(--accent-color); font-style: italic; min-height: 15px; }
+        .typing-box { min-height: 0; }
+        .typing-inline {
+            display: none;
+            align-items: flex-end;
+            gap: 8px;
+            padding: 0 15px 8px;
+            background: white;
+        }
+        .typing-inline-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #e6e6e6;
+            flex-shrink: 0;
+        }
+        .typing-bubble {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            background: #f0f0f0;
+            border-radius: 16px;
+            padding: 8px 11px;
+            line-height: 1;
+        }
+        .typing-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #8c8c8c;
+            opacity: 0.35;
+            animation: typingPulse 1s infinite ease-in-out;
+        }
+        .typing-dot:nth-child(2) { animation-delay: 0.15s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.3s; }
+        @keyframes typingPulse {
+            0%, 80%, 100% { transform: translateY(0); opacity: 0.35; }
+            40% { transform: translateY(-2px); opacity: 1; }
+        }
 
         /* Bulles et Messages Groupés */
         .messages-list { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; background: white; overflow-x: hidden; }
@@ -235,12 +288,20 @@
             <div class="side-action left"><button id="back-btn" class="header-btn" style="color:var(--text-dark);"><i class="fas fa-chevron-left"></i></button></div>
             <div class="header-info">
                 <span id="target-name" class="header-name"></span>
-                <span id="typing-box" class="typing-box"></span>
             </div>
             <div class="side-action right" id="header-pfp-container"></div>
         </div>
         
         <div class="messages-list" id="messages-list"></div>
+
+        <div id="typing-inline" class="typing-inline" aria-live="polite">
+            <div class="typing-inline-avatar"></div>
+            <div class="typing-bubble">
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+            </div>
+        </div>
 
         <div id="reply-banner">
             <span id="reply-text"></span>
@@ -279,12 +340,56 @@
         const isGifUrl = (text) => typeof text === 'string' && /(giphy\.com|tenor\.com|media\d*\.tenor\.com|\.gif($|\?))/i.test(text);
         const initializedAudioPlayers = new WeakSet();
 
+        const getTimestampMs = (ts) => {
+            if (!ts) return 0;
+            if (typeof ts.toDate === 'function') return ts.toDate().getTime();
+            if (typeof ts.seconds === 'number') return ts.seconds * 1000;
+            return 0;
+        };
+
+        const formatRelativeTime = (timestampMs) => {
+            if (!timestampMs) return '';
+            const diff = Date.now() - timestampMs;
+            const min = Math.floor(diff / 60000);
+            if (min < 1) return 'à l\'instant';
+            if (min < 60) return `il y a ${min} min`;
+            const h = Math.floor(min / 60);
+            if (h < 24) return `il y a ${h}h`;
+            const d = Math.floor(h / 24);
+            if (d < 7) return `il y a ${d}j`;
+            return new Date(timestampMs).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+        };
+
+        const formatConversationTime = (timestampMs) => {
+            if (!timestampMs) return '';
+            const dt = new Date(timestampMs);
+            return dt.toLocaleString('fr-FR', {
+                hour: '2-digit',
+                minute: '2-digit',
+                day: '2-digit',
+                month: '2-digit'
+            }).replace(',', ' -');
+        };
+
         function scrollMessagesToBottom() {
             const list = document.getElementById('messages-list');
             if(!list) return;
             list.scrollTop = list.scrollHeight;
             requestAnimationFrame(() => { list.scrollTop = list.scrollHeight; });
             setTimeout(() => { list.scrollTop = list.scrollHeight; }, 120);
+        }
+
+        function setTypingIndicator(isTyping) {
+            const typingInline = document.getElementById('typing-inline');
+            if(!typingInline) return;
+            if(!isTyping) {
+                typingInline.style.display = 'none';
+                scrollMessagesToBottom();
+                return;
+            }
+
+            typingInline.style.display = 'flex';
+            scrollMessagesToBottom();
         }
 
         function showView(viewId) {
@@ -392,10 +497,14 @@
             
             // Retrait de la bio pour un aperçu plus propre
             let preview = "Appuyer pour discuter";
+            let timeText = "";
             if (data.lastMsg) {
                 if (data.lastMsg.text.startsWith('[AUDIO]') || data.lastMsg.text.startsWith('data:audio')) preview = "🎙️ Message vocal";
-                else if (data.lastMsg.text.includes('giphy.com')) preview = "GIF";
+                else if (isGifUrl(data.lastMsg.text)) preview = "GIF";
                 else preview = data.lastMsg.text;
+
+                if (data.lastMsg.user === currentUser) preview = `Vous : ${preview}`;
+                timeText = formatRelativeTime(getTimestampMs(data.lastMsg.timestamp));
             }
 
             const pfpHTML = isGlobal 
@@ -405,7 +514,10 @@
             item.innerHTML = `
                 ${pfpHTML}
                 <div class="user-info">
-                    <div class="user-top"><span class="user-name">${data.username}</span></div>
+                    <div class="user-top">
+                        <span class="user-name">${data.username}</span>
+                        <span class="user-time">${timeText}</span>
+                    </div>
                     <div class="user-preview">${preview}</div>
                 </div>
             `;
@@ -417,7 +529,7 @@
         function setReplyTo(user, text) {
             let replyPreview = text;
             if(text.startsWith('[AUDIO]') || text.startsWith('data:audio')) replyPreview = 'Message vocal';
-            else if (text.includes('giphy.com')) replyPreview = 'GIF';
+            else if (isGifUrl(text)) replyPreview = 'GIF';
             
             replyingTo = { user, text: replyPreview };
             document.getElementById('reply-banner').style.display = 'flex';
@@ -444,6 +556,7 @@
             currentTarget = target; showView('chat-interface');
             document.getElementById('target-name').innerText = target === "Global" ? "Salon Global" : target;
             document.getElementById('cancel-reply-btn').click();
+            setTypingIndicator(false);
             
             // Gestion Header (Terre ou PFP)
             const headerPfpContainer = document.getElementById('header-pfp-container');
@@ -475,10 +588,22 @@
                 let lastUser = null;
                 let currentGroupWrapper = null;
                 let currentContentDiv = null;
+                let previousMsgTime = 0;
+                let lastMineMessageRead = false;
+                let lastMineContentDiv = null;
 
                 snap.forEach(d => {
                     const m = d.data();
                     if(m.chatId === chatId) {
+                        const currentMsgTime = getTimestampMs(m.timestamp);
+                        if (previousMsgTime && currentMsgTime && (currentMsgTime - previousMsgTime) > 90 * 60 * 1000) {
+                            const divider = document.createElement('div');
+                            divider.className = 'chat-time-divider';
+                            divider.innerText = formatConversationTime(currentMsgTime);
+                            list.appendChild(divider);
+                            lastUser = null;
+                        }
+
                         const isMine = m.user === currentUser;
 
                         if (m.user !== lastUser) {
@@ -540,15 +665,34 @@
                         msgContainer.appendChild(msgDiv);
                         msgContainer.appendChild(replyBtn);
                         currentContentDiv.appendChild(msgContainer); 
+
+                        if (isMine) {
+                            lastMineMessageRead = !!m.read;
+                            lastMineContentDiv = currentContentDiv;
+                        }
                         
                         lastUser = m.user;
+                        previousMsgTime = currentMsgTime || previousMsgTime;
                     }
                 });
+
+                if (lastMineMessageRead && lastMineContentDiv) {
+                    const readDiv = document.createElement('div');
+                    readDiv.className = 'msg-read-status';
+                    readDiv.innerText = 'Lu';
+                    lastMineContentDiv.appendChild(readDiv);
+                }
+
                 scrollMessagesToBottom();
             });
 
-            if (target !== "Global") onSnapshot(doc(db, "users", target), (d) => document.getElementById('typing-box').innerText = (d.exists() && d.data().isTyping) ? `écrit...` : "");
-            else document.getElementById('typing-box').innerText = "";
+            if (target !== "Global") {
+                onSnapshot(doc(db, "users", target), (d) => {
+                    setTypingIndicator(d.exists() && d.data().isTyping);
+                });
+            } else {
+                setTypingIndicator(false);
+            }
         }
 
         // ENVOI & VOCAUX
