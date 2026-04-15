@@ -135,7 +135,7 @@
         }
 
         /* =========================================
-           CSS MESSAGERIE V2 (Multi-salles)
+           CSS MESSAGERIE V3 (Sécurité + Salles)
            ========================================= */
         .chat-popup {
             position: fixed;
@@ -175,7 +175,8 @@
 
         /* Écran 1: Login */
         .chat-login { padding: 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; text-align: center; }
-        .chat-login input { padding: 10px; margin: 15px 0; border: 1px solid #ccc; border-radius: 5px; width: 80%; font-family: 'Roboto', sans-serif; }
+        .chat-login input { padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; width: 80%; font-family: 'Roboto', sans-serif; }
+        .info-text { font-size: 0.8rem; color: #666; margin-bottom: 15px; }
 
         /* Écran 2: Sélection du destinataire */
         .chat-selection { padding: 15px; display: none; flex-direction: column; height: 100%; }
@@ -262,15 +263,16 @@
         <div class="chat-body">
             
             <div class="chat-login" id="chat-login">
-                <p>Comment dois-je vous appeler ?</p>
-                <input type="text" id="username-input" placeholder="Votre prénom ou pseudo..." autocomplete="off">
+                <p style="margin-bottom: 5px; font-weight: bold;">Identifiez-vous</p>
+                <input type="text" id="username-input" placeholder="Votre pseudo..." autocomplete="off">
+                <input type="password" id="pin-input" placeholder="Code secret (6 chiffres)" maxlength="6" pattern="\d{6}" autocomplete="off">
+                <p class="info-text">Si le pseudo est nouveau, ce code sera enregistré comme votre mot de passe.</p>
                 <button class="btn btn-primary" id="start-chat-btn">Se connecter</button>
             </div>
 
             <div class="chat-selection" id="chat-selection">
                 <p>Avec qui voulez-vous discuter ?</p>
-                <div class="user-list" id="user-list">
-                    </div>
+                <div class="user-list" id="user-list"></div>
             </div>
 
             <div class="chat-messages-container" id="chat-interface">
@@ -290,9 +292,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // La configuration API que tu m'as fournie
         const firebaseConfig = {
             apiKey: "AIzaSyAuXwoROo6ZCjZWDLq79XKzUD7oS3ws7nM",
             authDomain: "portfolio-adam-1577e.firebaseapp.com",
@@ -305,55 +306,77 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Variables DOM
         const chatPopup = document.getElementById('chat-popup');
         const chatLogin = document.getElementById('chat-login');
         const chatSelection = document.getElementById('chat-selection');
         const chatInterface = document.getElementById('chat-interface');
         
         let currentUser = "";
-        let currentTarget = ""; // "Global" ou le pseudo de la personne
+        let currentTarget = "";
         let messagesUnsubscribe = null;
 
-        // --- NAVIGATION UI ---
+        // --- NAVIGATION ---
         document.getElementById('open-chat-btn').addEventListener('click', () => chatPopup.classList.add('active'));
         document.getElementById('close-chat-btn').addEventListener('click', () => chatPopup.classList.remove('active'));
         
         document.getElementById('back-to-users-btn').addEventListener('click', () => {
-            if (messagesUnsubscribe) messagesUnsubscribe(); // On arrête d'écouter les messages de cet ancien salon
+            if (messagesUnsubscribe) messagesUnsubscribe();
             chatInterface.style.display = 'none';
             chatSelection.style.display = 'flex';
         });
 
-        // --- ETAPE 1 : CONNEXION ---
+        // --- ETAPE 1 : CONNEXION AVEC PIN ---
         document.getElementById('start-chat-btn').addEventListener('click', async () => {
             const username = document.getElementById('username-input').value.trim();
+            const pin = document.getElementById('pin-input').value.trim();
             
-            // Vérifie que le pseudo n'est pas vide et ne commence pas par '['
-            if (username && !username.startsWith('[')) {
+            // Vérifications basiques
+            if (!username || username.startsWith('[')) {
+                alert("Pseudo invalide (ne doit pas être vide ou commencer par '[').");
+                return;
+            }
+            if (!/^\d{6}$/.test(pin)) {
+                alert("Le code secret doit contenir exactement 6 chiffres.");
+                return;
+            }
+
+            try {
+                const userRef = doc(db, "users", username);
+                const userSnap = await getDoc(userRef); // On va chercher l'utilisateur dans la base
+
+                if (userSnap.exists()) {
+                    // L'utilisateur existe déjà, on vérifie son PIN
+                    const userData = userSnap.data();
+                    if (userData.pin !== pin) {
+                        alert("Code secret incorrect pour ce pseudo !");
+                        return; // On bloque la connexion
+                    }
+                    // Met à jour sa dernière connexion
+                    await setDoc(userRef, { lastSeen: serverTimestamp() }, { merge: true });
+                } else {
+                    // L'utilisateur n'existe pas, on le crée avec ce PIN
+                    await setDoc(userRef, {
+                        username: username,
+                        pin: pin,
+                        lastSeen: serverTimestamp()
+                    });
+                }
+
+                // Si on arrive ici, c'est que la connexion est réussie !
                 currentUser = username;
                 chatLogin.style.display = 'none';
                 chatSelection.style.display = 'flex';
-
-                // On sauvegarde le User dans la BDD Firestore (collection "users")
-                try {
-                    await setDoc(doc(db, "users", currentUser), {
-                        username: currentUser,
-                        lastSeen: serverTimestamp()
-                    }, { merge: true });
-                } catch (e) {
-                    console.error("Erreur save user:", e);
-                }
-
                 loadUserList();
-            } else {
-                alert("Pseudo invalide (ne doit pas être vide ou commencer par '[')");
+
+            } catch (e) {
+                console.error("Erreur de connexion:", e);
+                alert("Une erreur serveur est survenue.");
             }
         });
 
-        document.getElementById('username-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') document.getElementById('start-chat-btn').click();
-        });
+        // Permettre "Entrée" sur les champs
+        document.getElementById('username-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') document.getElementById('pin-input').focus(); });
+        document.getElementById('pin-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') document.getElementById('start-chat-btn').click(); });
 
         // --- ETAPE 2 : LISTE DES USERS ---
         function loadUserList() {
@@ -363,19 +386,16 @@
             onSnapshot(q, (snapshot) => {
                 userListDiv.innerHTML = ''; 
 
-                // 1. Bouton "Global" toujours en premier
                 const globalBtn = document.createElement('button');
                 globalBtn.className = 'user-list-btn global-btn';
                 globalBtn.innerHTML = '<i class="fas fa-globe"></i> Salon Global';
                 globalBtn.onclick = () => openChat("Global");
                 userListDiv.appendChild(globalBtn);
 
-                // 2. Ajouter les autres utilisateurs
                 snapshot.forEach((docSnap) => {
                     const data = docSnap.data();
                     const uname = data.username;
                     
-                    // Exclure soi-même et ceux commençant par '['
                     if (uname !== currentUser && !uname.startsWith('[')) {
                         const btn = document.createElement('button');
                         btn.className = 'user-list-btn';
@@ -392,10 +412,7 @@
             currentTarget = targetUser;
             chatSelection.style.display = 'none';
             chatInterface.style.display = 'flex';
-            
-            // Met à jour le titre en haut du chat
             document.getElementById('chat-target-label').innerText = targetUser === "Global" ? "Salon Global" : `Message à : ${targetUser}`;
-            
             loadMessages();
         }
 
@@ -406,10 +423,6 @@
             
             if (text !== "" && currentUser !== "") {
                 msgInput.value = "";
-                
-                // L'astuce du ChatId :
-                // Si Global = "Global".
-                // Si Privé = On fusionne les deux pseudos par ordre alphabétique (Ex: "Adam_Bob")
                 const expectedChatId = currentTarget === "Global" 
                     ? "Global" 
                     : [currentUser, currentTarget].sort().join('_');
@@ -418,7 +431,7 @@
                     await addDoc(collection(db, "messages"), {
                         user: currentUser,
                         text: text,
-                        chatId: expectedChatId, // On attache la conversation au message
+                        chatId: expectedChatId,
                         timestamp: serverTimestamp()
                     });
                 } catch (e) { console.error("Erreur d'envoi: ", e); }
@@ -426,30 +439,22 @@
         }
 
         document.getElementById('send-btn').addEventListener('click', sendMessage);
-        document.getElementById('msg-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
-        });
+        document.getElementById('msg-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
 
         // --- RECEPTION DES MESSAGES ---
         function loadMessages() {
             const messagesList = document.getElementById('messages-list');
             const q = query(collection(db, "messages"), orderBy("timestamp", "asc"));
             
-            // On calcule l'ID de la conversation qu'on est en train de regarder
-            const expectedChatId = currentTarget === "Global" 
-                ? "Global" 
-                : [currentUser, currentTarget].sort().join('_');
+            const expectedChatId = currentTarget === "Global" ? "Global" : [currentUser, currentTarget].sort().join('_');
 
             messagesUnsubscribe = onSnapshot(q, (snapshot) => {
                 messagesList.innerHTML = '';
                 snapshot.forEach((docSnap) => {
                     const data = docSnap.data();
                     const isMine = data.user === currentUser;
-                    
-                    // Rétrocompatibilité : si un message n'a pas de chatId (anciens messages), il est Global
                     const msgChatId = data.chatId || "Global";
                     
-                    // On affiche le message UNIQUEMENT s'il appartient à cette conversation
                     if (msgChatId === expectedChatId) {
                         let timeString = "";
                         if(data.timestamp) {
