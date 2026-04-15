@@ -105,9 +105,48 @@
 
         .message img { max-width: 100%; border-radius: 10px; display: block; margin-top: 5px; }
         
-        /* Audio Vocaux */
-        .message audio { height: 40px; width: 220px; outline: none; max-width: 100%; border-radius: 20px; }
-        .message.mine audio { filter: invert(1); }
+        /* Audio Vocaux - Custom Player style Instagram */
+        .audio-player { 
+            display: flex; align-items: center; gap: 10px; 
+            padding: 12px; background: rgba(0,0,0,0.05); 
+            border-radius: 18px; width: fit-content; max-width: 280px; 
+            margin-top: 5px; cursor: pointer; transition: 0.2s;
+        }
+        .message.mine .audio-player { background: rgba(255,255,255,0.15); }
+        .audio-player:hover { background: rgba(0,0,0,0.08); }
+        .message.mine .audio-player:hover { background: rgba(255,255,255,0.2); }
+        
+        .audio-play-btn { 
+            width: 40px; height: 40px; border-radius: 50%; 
+            background: var(--accent-color); border: none; 
+            display: flex; align-items: center; justify-content: center; 
+            color: white; cursor: pointer; flex-shrink: 0; 
+            font-size: 1rem; transition: 0.2s;
+        }
+        .audio-play-btn:hover { transform: scale(1.1); }
+        .message.mine .audio-play-btn { background: rgba(255,255,255,0.3); color: white; }
+        
+        .audio-progress-container { 
+            flex: 1; display: flex; flex-direction: column; gap: 4px; 
+            min-width: 150px;
+        }
+        .audio-progress-bar { 
+            width: 100%; height: 3px; background: rgba(0,0,0,0.2); 
+            border-radius: 2px; cursor: pointer; position: relative;
+        }
+        .message.mine .audio-progress-bar { background: rgba(255,255,255,0.3); }
+        
+        .audio-progress-fill { 
+            height: 100%; background: var(--accent-color); 
+            border-radius: 2px; transition: width 0.01s linear;
+        }
+        .message.mine .audio-progress-fill { background: rgba(255,255,255,0.8); }
+        
+        .audio-time { 
+            font-size: 0.75rem; color: #888; 
+            font-weight: 500;
+        }
+        .message.mine .audio-time { color: rgba(255,255,255,0.7); }
 
         /* Réponse (Reply) UI */
         .reply-quote { background: rgba(0,0,0,0.1); padding: 6px 10px; border-radius: 6px; border-left: 3px solid rgba(0,0,0,0.3); font-size: 0.8rem; margin-bottom: 6px; display: block; opacity: 0.9; }
@@ -477,7 +516,21 @@
                         // Reconnaissance Audio ET anciens bugs audios
                         if (m.text.startsWith('[AUDIO]') || m.text.startsWith('data:audio')) {
                             const audioSrc = m.text.replace('[AUDIO]', '');
-                            innerHTML += `<audio controls src="${audioSrc}"></audio>`;
+                            const audioId = `audio-${Date.now()}-${Math.random()}`;
+                            innerHTML += `
+                                <div class="audio-player" data-audio-id="${audioId}">
+                                    <button class="audio-play-btn" onclick="window.toggleAudio(event, '${audioId}')">
+                                        <i class="fas fa-play"></i>
+                                    </button>
+                                    <div class="audio-progress-container">
+                                        <div class="audio-progress-bar" onclick="window.seekAudio(event, '${audioId}')">
+                                            <div class="audio-progress-fill" style="width: 0%"></div>
+                                        </div>
+                                        <div class="audio-time"><span class="current">0:00</span> / <span class="duration">0:00</span></div>
+                                    </div>
+                                    <audio id="${audioId}" src="${audioSrc}" style="display:none;"></audio>
+                                </div>
+                            `;
                             msgDiv.style.background = 'transparent'; msgDiv.style.padding = '0'; msgDiv.style.boxShadow = 'none';
                         } 
                         else if (m.text.includes('giphy.com')) {
@@ -661,6 +714,108 @@
             });
         }
 
+        // --- CUSTOM AUDIO PLAYER ---
+        window.audioPlaying = null;
+        
+        window.toggleAudio = (event, audioId) => {
+            event.stopPropagation();
+            const audio = document.getElementById(audioId);
+            const btn = event.currentTarget;
+            const player = btn.closest('.audio-player');
+            
+            if(!audio) return;
+            
+            // Si un autre audio joue, l'arrêter
+            if(window.audioPlaying && window.audioPlaying !== audioId) {
+                const prevAudio = document.getElementById(window.audioPlaying);
+                const prevBtn = prevAudio?.closest('.audio-player')?.querySelector('.audio-play-btn');
+                if(prevAudio) prevAudio.pause();
+                if(prevBtn) prevBtn.innerHTML = '<i class="fas fa-play"></i>';
+            }
+            
+            if(audio.paused) {
+                audio.play();
+                btn.innerHTML = '<i class="fas fa-pause"></i>';
+                window.audioPlaying = audioId;
+                updateAudioTime(audioId);
+            } else {
+                audio.pause();
+                btn.innerHTML = '<i class="fas fa-play"></i>';
+                window.audioPlaying = null;
+            }
+        };
+        
+        window.seekAudio = (event, audioId) => {
+            event.stopPropagation();
+            const audio = document.getElementById(audioId);
+            if(!audio) return;
+            
+            const bar = event.currentTarget;
+            const rect = bar.getBoundingClientRect();
+            const percent = (event.clientX - rect.left) / rect.width;
+            audio.currentTime = percent * audio.duration;
+        };
+        
+        const updateAudioTime = (audioId) => {
+            const audio = document.getElementById(audioId);
+            if(!audio) return;
+            
+            const player = audio.closest('.audio-player');
+            if(!player) return;
+            
+            const updateUI = () => {
+                const fill = player.querySelector('.audio-progress-fill');
+                const current = player.querySelector('.audio-time .current');
+                const duration = player.querySelector('.audio-time .duration');
+                const btn = player.querySelector('.audio-play-btn');
+                
+                if(fill) fill.style.width = (audio.currentTime / audio.duration * 100) + '%';
+                if(current) current.innerText = formatTime(audio.currentTime);
+                if(duration) duration.innerText = formatTime(audio.duration);
+                
+                if(!audio.paused) {
+                    requestAnimationFrame(updateUI);
+                } else if(audio.ended) {
+                    btn.innerHTML = '<i class="fas fa-play"></i>';
+                    window.audioPlaying = null;
+                }
+            };
+            
+            audio.addEventListener('loadedmetadata', () => {
+                const duration = player.querySelector('.audio-time .duration');
+                if(duration) duration.innerText = formatTime(audio.duration);
+            });
+            
+            audio.addEventListener('play', updateUI);
+            audio.addEventListener('timeupdate', updateUI);
+            audio.addEventListener('ended', () => {
+                btn.innerHTML = '<i class="fas fa-play"></i>';
+                window.audioPlaying = null;
+            });
+        };
+        
+        const formatTime = (seconds) => {
+            if(!seconds || isNaN(seconds)) return '0:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        };
+        
+        // Initialiser les lecteurs audio après rendu
+        const initAudioPlayers = () => {
+            document.querySelectorAll('.audio-player').forEach(player => {
+                const audioId = player.getAttribute('data-audio-id');
+                if(audioId) updateAudioTime(audioId);
+            });
+        };
+        
+        // Observer les changements du DOM pour initialiser les nouveaux audios
+        const messagesList = document.getElementById('messages-list');
+        if(messagesList) {
+            const observer = new MutationObserver(() => initAudioPlayers());
+            observer.observe(messagesList, { childList: true, subtree: true });
+        }
+
         // GIFS - Utiliser source simple + fallback Giphy
         document.getElementById('toggle-gif').onclick = () => {
             const p = document.getElementById('gif-panel'); p.style.display = p.style.display === 'flex' ? 'none' : 'flex';
@@ -746,6 +901,14 @@
 
         // RETOUR
         document.getElementById('back-btn').onclick = () => {
+            // Arrêter tous les audios en cours
+            if(window.audioPlaying) {
+                const audio = document.getElementById(window.audioPlaying);
+                if(audio) audio.pause();
+                window.audioPlaying = null;
+            }
+            document.querySelectorAll('.audio-player audio').forEach(a => a.pause());
+            
             if(messagesUnsub) messagesUnsub(); if(unreadUnsub) unreadUnsub();
             updateDoc(doc(db, "users", currentUser), { isTyping: false }); showView('chat-selection');
         };
