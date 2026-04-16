@@ -733,15 +733,26 @@
             if (replyingTo) msgData.replyTo = replyingTo;
             await addDoc(collection(db, "messages"), msgData);
             document.getElementById('cancel-reply-btn').click();
-            if (currentTarget !== "Global") fetch(`https://ntfy.sh/cociska_chat_adam_${currentTarget.toLowerCase()}`, { 
-                method: 'POST', 
-                body: `${currentUser} a envoyé un message`, 
-                headers: { 
-                    'Title': 'Message sur cociska.dev', 
-                    'Click': window.location.href, 
-                    'Tags': 'speech_balloon' 
-                } 
-            }).catch(e=>e);
+            // Préparation du texte de la notification
+            let notifText = content;
+            if (content.startsWith('[AUDIO]')) {
+                notifText = "🎙️ Message vocal";
+            } else if (content.includes('giphy.com') || content.includes('tenor.com')) {
+                notifText = "GIF";
+            }
+
+            // Envoi de la notification Push
+            if (currentTarget !== "Global") {
+                fetch(`https://ntfy.sh/cociska_chat_adam_${currentTarget.toLowerCase()}`, { 
+                    method: 'POST', 
+                    body: `${currentUser} : ${notifText}`, 
+                    headers: { 
+                        'Title': 'Message sur cociska.dev', 
+                        'Click': window.location.href, 
+                        'Tags': 'speech_balloon' 
+                    } 
+                }).catch(e=>e);
+            }
         }
 
         sendTextBtn.onclick = () => { const t = msgInput.value.trim(); if(t) { sendFinal(t); msgInput.value = ""; msgInput.oninput(); } };
